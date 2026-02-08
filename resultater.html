@@ -1,0 +1,92 @@
+<!-- resultater.html-->
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F1 BOYZA – Resultater</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<header class="hero small">
+  <div class="overlay">
+    <h1>Resultater</h1>
+    <p>Tall lyver ikke. Folk gjør.</p>
+  </div>
+</header>
+<nav class="topnav">
+  <a href="index.html">Forside</a>
+  <a href="kalender.html">Kalender</a>
+  <a href="resultater.html" class="active">Resultater</a>
+</nav>
+<main class="container single">
+
+  <section class="card">
+    <h2>Poengutvikling – Førere</h2>
+    <canvas id="driverChart"></canvas>
+    <table id="driverTable">
+      <thead><tr><th>Fører</th><th>Totalt</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Poengutvikling – Lag</h2>
+    <canvas id="teamChart"></canvas>
+    <table id="teamTable">
+      <thead><tr><th>Lag</th><th>Totalt</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+</main>
+<footer>© F1 BOYZA</footer>
+
+<script>
+  fetch('resultater.json')
+    .then(r => r.json())
+    .then(data => {
+      // Førere
+      new Chart(document.getElementById('driverChart'), {
+        type: 'line',
+        data: {
+          labels: data.runder,
+          datasets: data.forere.map(f => ({
+            label: f.navn,
+            data: f.poeng,
+            tension: 0.3,
+            borderWidth: 3
+          }))
+        }
+      });
+
+      const dTable = document.querySelector('#driverTable tbody');
+      data.forere.forEach(f => {
+        const total = f.poeng[f.poeng.length - 1];
+        dTable.innerHTML += `<tr><td>${f.navn}</td><td>${total}</td></tr>`;
+      });
+
+      // Lag
+      new Chart(document.getElementById('teamChart'), {
+        type: 'line',
+        data: {
+          labels: data.runder,
+          datasets: data.lag.map(l => ({
+            label: l.navn,
+            data: l.poeng,
+            tension: 0.3,
+            borderWidth: 3
+          }))
+        }
+      });
+
+      const tTable = document.querySelector('#teamTable tbody');
+      data.lag.forEach(l => {
+        const total = l.poeng[l.poeng.length - 1];
+        tTable.innerHTML += `<tr><td>${l.navn}</td><td>${total}</td></tr>`;
+      });
+    });
+</script>
+</body>
+</html>

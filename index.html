@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F1 BOYZA – Forside</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="hero">
+  <div class="overlay">
+    <h1>F1 BOYZA</h1>
+    <p>Full gass. Null ansvar.</p>
+  </div>
+</header>
+<nav class="topnav">
+  <a href="index.html" class="active">Forside</a>
+  <a href="kalender.html">Kalender</a>
+  <a href="resultater.html">Resultater</a>
+</nav>
+<main class="container">
+
+  <section class="card">
+    <h2>Funny moments</h2>
+    <div class="slider">
+      <img id="slide" src="img/meme1.jpg" alt="funny moment" />
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Tidligere vinnere</h2>
+    <ul class="winners">
+      <li><span>Sesong 1 construcor</span><strong>FERRARI</strong></li>
+      <li><span>Sesong 1 driver</span><strong>Shaya</strong></li>
+    </ul>
+  </section>
+
+</main>
+<footer>© F1 BOYZA</footer>
+
+<script>
+  const images = [
+    'img/meme1.jpg',
+    'img/meme2.jpg',
+    'img/meme3.jpg'
+  ];
+  let i = 0;
+  setInterval(() => {
+    i = (i + 1) % images.length;
+    document.getElementById('slide').src = images[i];
+  }, 3000);
+</script>
+</body>
+</html>

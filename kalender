@@ -1,0 +1,8 @@
+{
+  "baner": [
+    { "navn": "Bahrain", "kjort": true },
+    { "navn": "Imola", "kjort": true },
+    { "navn": "Spa", "kjort": false },
+    { "navn": "Monza", "kjort": false }
+  ]
+}

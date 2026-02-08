@@ -1,0 +1,45 @@
+<!-- kalender.html -->
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F1 BOYZA – Kalender</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="hero small">
+  <div class="overlay">
+    <h1>Sesongkalender</h1>
+    <p>Avlyst? Aldri. Forsinket? Alltid.</p>
+  </div>
+</header>
+<nav class="topnav">
+  <a href="index.html">Forside</a>
+  <a href="kalender.html" class="active">Kalender</a>
+  <a href="resultater.html">Resultater</a>
+</nav>
+<main class="container single">
+  <section class="card">
+    <ul id="calendarList" class="calendar"></ul>
+  </section>
+</main>
+<footer>© F1 BOYZA</footer>
+
+<script>
+  fetch('kalender.json')
+    .then(r => r.json())
+    .then(data => {
+      const list = document.getElementById('calendarList');
+      data.baner.forEach(b => {
+        const li = document.createElement('li');
+        li.className = b.kjort ? 'done' : 'pending';
+        li.textContent = b.navn;
+        list.appendChild(li);
+      });
+    });
+</script>
+</body>
+</html>
+
+
