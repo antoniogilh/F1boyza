@@ -30,8 +30,10 @@
   fetch('kalender')
     .then(r => r.json())
     .then(data => {
+      /** @type {{baner: {navn: string, kjort: boolean}[]}}*/
+      const kalender = data;
       const list = document.getElementById('calendarList');
-      data.baner.forEach(b => {
+      kalender.baner.forEach(b => {
         const li = document.createElement('li');
         li.className = b.kjort ? 'done' : 'pending';
         li.textContent = b.navn;
