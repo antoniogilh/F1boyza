@@ -1,8 +1,28 @@
 {
   "baner": [
     { "navn": "Bahrain", "kjort": true },
+    { "navn": "Saudi Arabia", "kjort": true },
+    { "navn": "Australia", "kjort": false },
+    { "navn": "Japan", "kjort": true },
+    { "navn": "China", "kjort": false },
+    { "navn": "Miami", "kjort": true },
     { "navn": "Imola", "kjort": true },
-    { "navn": "Spa", "kjort": false },
-    { "navn": "Monza", "kjort": false }
+    { "navn": "Monaco", "kjort": true },
+    { "navn": "Canada", "kjort": true },
+    { "navn": "Spania", "kjort": true },
+    { "navn": "Austria", "kjort": true },
+    { "navn": "Silverstone", "kjort": true },
+    { "navn": "Hungaro", "kjort": true },
+    { "navn": "Spa", "kjort": true },
+    { "navn": "Zandvoort", "kjort": true },
+    { "navn": "Monza", "kjort": true },
+    { "navn": "Azerbaijan", "kjort": true },
+    { "navn": "Singapore", "kjort": true },
+    { "navn": "Texas", "kjort": true },
+    { "navn": "Mexico", "kjort": true },
+    { "navn": "Interlagos", "kjort": true },
+    { "navn": "Las Vegas", "kjort": true },
+    { "navn": "Qatar", "kjort": true },
+    { "navn": "Abu Dhabi", "kjort": true },
   ]
 }
