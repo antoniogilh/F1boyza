@@ -23,6 +23,6 @@
     { "navn": "Interlagos", "kjort": true },
     { "navn": "Las Vegas", "kjort": true },
     { "navn": "Qatar", "kjort": true },
-    { "navn": "Abu Dhabi", "kjort": true },
+    { "navn": "Abu Dhabi", "kjort": true }
   ]
 }
