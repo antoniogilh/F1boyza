@@ -1,0 +1,11 @@
+{
+"penaltyPoints": [
+{ "fører": "Antonio", "poeng": 1, "runde": "R3", "beskrivelse": "Divebombet David og ødela vingen hans" },
+{ "fører": "Antonio", "poeng": 4, "runde": "R20", "beskrivelse": "Kjørte for nærme Gorba under safetycar" },
+{ "fører": "Shaya", "poeng": 2, "runde": "R15", "beskrivelse": "Skviste Gorba ut under racestart" },
+  { "fører": "Gorba", "poeng": 1, "runde": "R1", "beskrivelse": "Dunket Shaya hardt inn i veggen" },
+  { "fører": "Gorba", "poeng": 3, "runde": "R21", "beskrivelse": "Kræsjet inn i Antonio og Shaya" },
+  { "fører": "Gorba", "poeng": 5, "runde": "R22", "beskrivelse": "Break check og weaving for å sabotere" },
+  { "fører": "David", "poeng": 1, "runde": "R22", "beskrivelse": "Rammer Shaya i siden gjentatte ganger" }
+]
+}
