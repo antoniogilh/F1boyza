@@ -15,11 +15,15 @@
   </div>
 </header>
 <nav class="topnav">
-  <a href="index.html" class="active">Forside</a>
-  <a href="kalender.html">Kalender</a>
-  <a href="resultater.html">Resultater</a>
-  <a href="straff.html">Skammelig kjøring</a>
+  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">Forside</a>
+    <a href="kalender.html">Kalender</a>
+    <a href="resultater.html">Resultater</a>
+    <a href="straff.html">Skammelig kjøring</a>
+  </div>
 </nav>
+
 <main class="container">
 
   <section class="card">
@@ -39,17 +43,24 @@
 
 </main>
 <footer>© F1 BOYZA</footer>
+<footer>FRNZY on spotify</footer>
 
 <script>
   const images = [
     'funnypicai.jpg',
-    'episkfotofinish.jpg'
+    'episkfotofinish.jpg',
+    'frenzymonster.jpg'
   ];
   let i = 0;
   setInterval(() => {
     i = (i + 1) % images.length;
     document.getElementById('slide').src = images[i];
-  }, 5000);
+  }, 3500);
+</script>
+<script>
+  function toggleMenu() {
+    document.getElementById("navLinks").classList.toggle("active");
+  }
 </script>
 </body>
 </html>

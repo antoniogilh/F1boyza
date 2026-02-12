@@ -42,10 +42,13 @@
   </div>
 </header>
 <nav class="topnav">
-  <a href="index.html">Forside</a>
-  <a href="kalender.html">Kalender</a>
-  <a href="resultater.html">Resultater</a>
-  <a href="penalty.html" class="active">Penalty Points</a>
+  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">Forside</a>
+    <a href="kalender.html">Kalender</a>
+    <a href="resultater.html">Resultater</a>
+    <a href="straff.html">Skammelig kjøring</a>
+  </div>
 </nav>
 <main class="container single">
   <section class="card">
@@ -93,6 +96,11 @@
 `;
       });
     });
+</script>
+<script>
+  function toggleMenu() {
+    document.getElementById("navLinks").classList.toggle("active");
+  }
 </script>
 </body>
 </html>
