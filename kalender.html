@@ -8,6 +8,7 @@
   <title>F1 BOYZA – Kalender</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
 <header class="hero small">
   <div class="overlay">
@@ -15,6 +16,7 @@
     <p>Avlyst? Aldri. Forsinket? Alltid.</p>
   </div>
 </header>
+
 <nav class="topnav">
   <div class="menu-toggle" onclick="toggleMenu()">☰</div>
   <div class="nav-links" id="navLinks">
@@ -22,29 +24,58 @@
     <a href="kalender.html">Kalender</a>
     <a href="resultater.html">Resultater</a>
     <a href="straff.html">Skammelig kjøring</a>
+    <a href="Spinthatshit.html">Spin that SHIIIT</a>
   </div>
 </nav>
+
+<div class="season-select">
+  <label for="season">Sesong:</label>
+  <select id="season">
+    <option value="2025">2025</option>
+    <option value="2026">2026</option>
+  </select>
+</div>
+
 <main class="container single">
   <section class="card">
-    <ul id="calendarList" class="calendar"></ul>
+    <div id="calendar"></div>
   </section>
 </main>
+
 <footer>© F1 BOYZA</footer>
 
 <script>
-  fetch('kalender')
+  let kalenderData = {};
+
+  fetch("kalender")
     .then(r => r.json())
     .then(data => {
-      /** @type {{baner: {navn: string, kjort: boolean}[]}}*/
-      const kalender = data;
-      const list = document.getElementById('calendarList');
-      kalender.baner.forEach(b => {
-        const li = document.createElement('li');
-        li.className = b.kjort ? 'done' : 'pending';
-        li.textContent = b.navn;
-        list.appendChild(li);
-      });
+      kalenderData = data;
+      loadSeason(document.getElementById("season").value);
     });
+
+  document.getElementById("season").addEventListener("change", e => {
+    loadSeason(e.target.value);
+  });
+
+  function loadSeason(season) {
+    const container = document.getElementById("calendar");
+    container.innerHTML = "";
+
+    if (!kalenderData[season]) {
+      container.innerHTML = "<p>Ingen løp registrert for denne sesongen</p>";
+      return;
+    }
+
+    kalenderData[season].forEach(race => {
+      container.innerHTML += `
+      <div class="race ${race.kjort ? "done" : "not-done"}">
+        <div class="race-name">${race.navn}</div>
+        ${race.kjort ? `<div class="podium">${race.podium}</div>` : ""}
+      </div>
+    `;
+    });
+  }
 </script>
 <script>
   function toggleMenu() {

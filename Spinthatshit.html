@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="fanelogo.png" />
+  <title>F1 BOYZA – Spin the Wheel</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="hero small">
+  <div class="overlay">
+    <h1>Spin the Wheel – Neste Løp</h1>
+  </div>
+</header>
+
+<nav class="topnav">
+  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">Forside</a>
+    <a href="kalender.html">Kalender</a>
+    <a href="resultater.html">Resultater</a>
+    <a href="straff.html">Skammelig kjøring</a>
+    <a href="Spinthatshit.html">Spin the Wheel</a>
+  </div>
+</nav>
+
+<div class="season-select">
+  <label for="season">Sesong:</label>
+  <select id="season">
+    <option value="2025">2025</option>
+    <option value="2026">2026</option>
+  </select>
+</div>
+
+<div class="wheel-container">
+  <div class="wheel-wrapper">
+    <canvas id="wheel" width="350" height="350"></canvas>
+    <div id="arrow"></div>
+  </div>
+  <button id="spinBtn">Spin!</button>
+  <div id="result"></div>
+</div>
+
+<script>
+  // Navbar toggle
+  function toggleMenu() {
+    document.getElementById("navLinks").classList.toggle("active");
+  }
+
+  // ---------------- Wheel logic ----------------
+  let kalenderData = {};
+  let unrunTracks = [];
+  let segments = [];
+  let colors = ["#1e7f3b","#9b1c1c","#e68a00","#0066cc","#660099","#cc0066","#00cccc","#cccc00"];
+  let wheelCanvas = document.getElementById("wheel");
+  let ctx = wheelCanvas.getContext("2d");
+
+  // Hent kalender.json
+  fetch("kalender")
+    .then(r => r.json())
+    .then(data => {
+      kalenderData = data;
+      updateUnrunTracks(document.getElementById("season").value);
+      drawWheel();
+    });
+
+  document.getElementById("season").addEventListener("change", e => {
+    updateUnrunTracks(e.target.value);
+    drawWheel();
+    document.getElementById("result").textContent = "";
+  });
+
+  function updateUnrunTracks(season) {
+    if (!kalenderData[season]) { unrunTracks=[]; segments=[]; return; }
+    unrunTracks = kalenderData[season].filter(r => !r.kjort).map(r => r.navn);
+    segments = unrunTracks.slice();
+  }
+
+  function drawWheel() {
+    let num = segments.length;
+    let anglePer = (2*Math.PI)/(num||1);
+    ctx.clearRect(0,0,350,350);
+    for (let i=0;i<num;i++){
+      ctx.beginPath();
+      ctx.moveTo(175,175);
+      ctx.fillStyle = colors[i%colors.length];
+      ctx.arc(175,175,175,i*anglePer,(i+1)*anglePer);
+      ctx.fill();
+      ctx.save();
+      ctx.translate(175,175);
+      ctx.rotate((i+0.5)*anglePer);
+      ctx.textAlign = "right";
+      ctx.fillStyle="#fff";
+      ctx.font="bold 14px Arial";
+      ctx.fillText(segments[i],160,0);
+      ctx.restore();
+    }
+  }
+
+  // Spin funksjon – korrekt resultat under pil
+  document.getElementById("spinBtn").addEventListener("click", () => {
+    if (segments.length===0){ document.getElementById("result").textContent="Ingen ubegynte baner igjen!"; return; }
+
+    const totalSpin = Math.random()*360 + 1440; // minst 2 runder
+    const duration = 7000;
+    let start = null;
+
+    function animate(timestamp){
+      if(!start) start = timestamp;
+      let progress = timestamp - start;
+      let ease = 1 - Math.pow(1 - progress/duration, 3);
+      let angle = totalSpin * ease;
+      wheelCanvas.style.transform = `rotate(${angle}deg)`;
+
+      if(progress < duration){
+        requestAnimationFrame(animate);
+      } else {
+        // Her får vi riktig index under pilen
+        const finalAngle = angle % 360;
+        const adjustedAngle = (finalAngle + 90) % 360;
+        const perSegment = 360 / segments.length;
+        const index = Math.floor((segments.length - (adjustedAngle / perSegment)) % segments.length);
+        document.getElementById("result").textContent = `Neste løp: ${segments[index]}`;
+      }
+    }
+
+    requestAnimationFrame(animate);
+  });
+</script>
+</body>
+</html>
