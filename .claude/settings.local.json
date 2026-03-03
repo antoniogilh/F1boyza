@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(where npm:*)",
+      "Bash(where node:*)",
+      "Bash(grep:*)",
+      "Bash(cd \"C:/Users/anton/IdeaProjects/F1boyza\" && npm.cmd start 2>&1)",
+      "Bash(npm start:*)",
+      "Bash(npm run:*)",
+      "Bash(npm install:*)"
+    ]
+  }
+}
