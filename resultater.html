@@ -1,4 +1,4 @@
-<!-- resultater.html-->
+<!-- resultater.html -->
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -6,8 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="fanelogo.png" />
   <title>F1 BOYZA – Resultater</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <header class="hero small">
@@ -17,7 +19,7 @@
   </div>
 </header>
 <nav class="topnav">
-  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  <div class="menu-toggle">☰</div>
   <div class="nav-links" id="navLinks">
     <a href="index.html">Forside</a>
     <a href="kalender.html">Kalender</a>
@@ -29,10 +31,23 @@
 <main class="container single">
 
   <section class="card">
-    <h2>Poengutvikling – Førere</h2>
+    <h2>⚡ Fun Stats</h2>
+    <div id="statsBlock" class="stats-block"></div>
+  </section>
+
+  <section class="card">
+    <h2>📊 Dominans</h2>
+    <div id="dominanceMeter"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2>Poengutvikling – Førere</h2>
+      <button id="chartToggle" class="toggle-btn">Vis per runde</button>
+    </div>
     <canvas id="driverChart"></canvas>
-    <table id="driverTable">
-      <thead><tr><th>Fører</th><th>Totalt</th></tr></thead>
+    <table id="driverTable" class="standings-table">
+      <thead><tr><th>#</th><th>Fører</th><th style="text-align:right">Totalt</th><th style="text-align:right">Gap</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -40,64 +55,26 @@
   <section class="card">
     <h2>Poengutvikling – Lag</h2>
     <canvas id="teamChart"></canvas>
-    <table id="teamTable">
-      <thead><tr><th>Lag</th><th>Totalt</th></tr></thead>
+    <table id="teamTable" class="standings-table">
+      <thead><tr><th>#</th><th>Lag</th><th style="text-align:right">Totalt</th><th style="text-align:right">Gap</th></tr></thead>
       <tbody></tbody>
     </table>
+  </section>
+
+  <section class="card">
+    <h2>🥊 Head-to-head</h2>
+    <div class="h2h-selects">
+      <select id="h2hDriver1" class="season-select"></select>
+      <span class="h2h-vs">VS</span>
+      <select id="h2hDriver2" class="season-select"></select>
+    </div>
+    <p id="h2hGap" class="h2h-gap"></p>
+    <canvas id="h2hChart"></canvas>
   </section>
 
 </main>
 <footer>© F1 BOYZA</footer>
 
-<script>
-  fetch('resultater')
-    .then(r => r.json())
-    .then(data => {
-      // Førere
-      new Chart(document.getElementById('driverChart'), {
-        type: 'line',
-        data: {
-          labels: data.runder,
-          datasets: data.forere.map(f => ({
-            label: f.navn,
-            data: f.poeng,
-            tension: 0.3,
-            borderWidth: 3
-          }))
-        }
-      });
-
-      const dTable = document.querySelector('#driverTable tbody');
-      data.forere.forEach(f => {
-        const total = f.poeng[f.poeng.length - 1];
-        dTable.innerHTML += `<tr><td>${f.navn}</td><td>${total}</td></tr>`;
-      });
-
-      // Lag
-      new Chart(document.getElementById('teamChart'), {
-        type: 'line',
-        data: {
-          labels: data.runder,
-          datasets: data.lag.map(l => ({
-            label: l.navn,
-            data: l.poeng,
-            tension: 0.3,
-            borderWidth: 3
-          }))
-        }
-      });
-
-      const tTable = document.querySelector('#teamTable tbody');
-      data.lag.forEach(l => {
-        const total = l.poeng[l.poeng.length - 1];
-        tTable.innerHTML += `<tr><td>${l.navn}</td><td>${total}</td></tr>`;
-      });
-    });
-</script>
-<script>
-  function toggleMenu() {
-    document.getElementById("navLinks").classList.toggle("active");
-  }
-</script>
+<script src="js/app.js"></script>
 </body>
 </html>

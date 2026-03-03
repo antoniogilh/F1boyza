@@ -6,9 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="fanelogo.png" />
   <title>F1 BOYZA – Kalender</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
 <header class="hero small">
   <div class="overlay">
@@ -18,7 +20,7 @@
 </header>
 
 <nav class="topnav">
-  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  <div class="menu-toggle">☰</div>
   <div class="nav-links" id="navLinks">
     <a href="index.html">Forside</a>
     <a href="kalender.html">Kalender</a>
@@ -28,61 +30,27 @@
   </div>
 </nav>
 
-<div class="season-select">
-  <label for="season">Sesong:</label>
-  <select id="season">
-    <option value="2025">2025</option>
-    <option value="2026">2026</option>
-  </select>
-</div>
-
 <main class="container single">
   <section class="card">
+    <div class="card-header">
+      <h2>Løp</h2>
+      <select id="season" class="season-select">
+        <option value="2025">2025</option>
+        <option value="2026" selected>2026</option>
+      </select>
+    </div>
     <div id="calendar"></div>
   </section>
+
+  <section class="card">
+    <h2>Løpsdatoer</h2>
+    <div id="datesTable"></div>
+  </section>
+
 </main>
 
 <footer>© F1 BOYZA</footer>
 
-<script>
-  let kalenderData = {};
-
-  fetch("kalender")
-    .then(r => r.json())
-    .then(data => {
-      kalenderData = data;
-      loadSeason(document.getElementById("season").value);
-    });
-
-  document.getElementById("season").addEventListener("change", e => {
-    loadSeason(e.target.value);
-  });
-
-  function loadSeason(season) {
-    const container = document.getElementById("calendar");
-    container.innerHTML = "";
-
-    if (!kalenderData[season]) {
-      container.innerHTML = "<p>Ingen løp registrert for denne sesongen</p>";
-      return;
-    }
-
-    kalenderData[season].forEach(race => {
-      container.innerHTML += `
-      <div class="race ${race.kjort ? "done" : "not-done"}">
-        <div class="race-name">${race.navn}</div>
-        ${race.kjort ? `<div class="podium">${race.podium}</div>` : ""}
-      </div>
-    `;
-    });
-  }
-</script>
-<script>
-  function toggleMenu() {
-    document.getElementById("navLinks").classList.toggle("active");
-  }
-</script>
+<script src="js/app.js"></script>
 </body>
 </html>
-
-
