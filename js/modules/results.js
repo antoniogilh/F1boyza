@@ -210,73 +210,94 @@ export function initResults() {
   Promise.all([
     fetchData('data/resultater.json'),
     fetchData('data/kalender.json'),
-  ]).then(([data, kalenderData]) => {
-    if (!data) return;
+  ]).then(([allData, kalenderData]) => {
+    if (!allData) return;
 
-    let cumulative = true;
+    const seasonSelect = document.getElementById('seasonSelect');
+    const seasons = Object.keys(allData).sort().reverse();
 
-    const driverCtx = driverChartEl.getContext('2d');
-    const teamCtx   = teamChartEl.getContext('2d');
+    seasons.forEach(yr => seasonSelect.add(new Option(yr, yr)));
+    seasonSelect.value = seasons[0];
 
-    const driverChart = new Chart(driverChartEl, {
-      type: 'line',
-      data: {
-        labels: data.runder,
-        datasets: data.forere.map((f, i) => {
-          const color = COLORS[i % COLORS.length];
-          return {
-            label: f.navn, data: [...f.poeng], tension: 0,
-            borderWidth: 3, pointRadius: 4, pointHoverRadius: 6,
-            borderColor: color,
-            backgroundColor: makeGradient(driverCtx, color),
-            fill: true,
-          };
-        })
-      },
-      options: CHART_OPTIONS,
-    });
+    let driverChart = null;
+    let teamChart   = null;
 
-    buildTable(document.getElementById('driverTable'), data.forere, data.forere, kalenderData || {}, data.runder);
+    function render() {
+      const data = allData[seasonSelect.value];
+      if (!data) return;
 
-    const teamChart = new Chart(teamChartEl, {
-      type: 'line',
-      data: {
-        labels: data.runder,
-        datasets: data.lag.map((l, i) => {
-          const color = COLORS[i % COLORS.length];
-          return {
-            label: l.navn, data: [...l.poeng], tension: 0,
-            borderWidth: 3, pointRadius: 4, pointHoverRadius: 6,
-            borderColor: color,
-            backgroundColor: makeGradient(teamCtx, color),
-            fill: true,
-          };
-        })
-      },
-      options: CHART_OPTIONS,
-    });
+      let cumulative = true;
+      const toggleBtn = document.getElementById('chartToggle');
+      if (toggleBtn) toggleBtn.textContent = 'Vis per runde';
 
-    buildTable(document.getElementById('teamTable'), data.lag, data.lag, kalenderData || {}, data.runder);
+      const driverCtx = driverChartEl.getContext('2d');
+      const teamCtx   = teamChartEl.getContext('2d');
 
-    const toggleBtn = document.getElementById('chartToggle');
-    if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => {
-        cumulative = !cumulative;
-        toggleBtn.textContent = cumulative ? 'Vis per runde' : 'Vis totalt';
+      if (driverChart) driverChart.destroy();
+      if (teamChart)   teamChart.destroy();
 
-        driverChart.data.datasets.forEach((ds, i) => {
-          ds.data = cumulative ? [...data.forere[i].poeng] : toPerRound(data.forere[i].poeng);
-        });
-        driverChart.update();
-
-        teamChart.data.datasets.forEach((ds, i) => {
-          ds.data = cumulative ? [...data.lag[i].poeng] : toPerRound(data.lag[i].poeng);
-        });
-        teamChart.update();
+      driverChart = new Chart(driverChartEl, {
+        type: 'line',
+        data: {
+          labels: data.runder,
+          datasets: data.forere.map((f, i) => {
+            const color = COLORS[i % COLORS.length];
+            return {
+              label: f.navn, data: [...f.poeng], tension: 0,
+              borderWidth: 3, pointRadius: 4, pointHoverRadius: 6,
+              borderColor: color,
+              backgroundColor: makeGradient(driverCtx, color),
+              fill: true,
+            };
+          })
+        },
+        options: CHART_OPTIONS,
       });
+
+      buildTable(document.getElementById('driverTable'), data.forere, data.forere, kalenderData || {}, data.runder);
+
+      teamChart = new Chart(teamChartEl, {
+        type: 'line',
+        data: {
+          labels: data.runder,
+          datasets: data.lag.map((l, i) => {
+            const color = COLORS[i % COLORS.length];
+            return {
+              label: l.navn, data: [...l.poeng], tension: 0,
+              borderWidth: 3, pointRadius: 4, pointHoverRadius: 6,
+              borderColor: color,
+              backgroundColor: makeGradient(teamCtx, color),
+              fill: true,
+            };
+          })
+        },
+        options: CHART_OPTIONS,
+      });
+
+      buildTable(document.getElementById('teamTable'), data.lag, data.lag, kalenderData || {}, data.runder);
+
+      if (toggleBtn) {
+        toggleBtn.onclick = () => {
+          cumulative = !cumulative;
+          toggleBtn.textContent = cumulative ? 'Vis per runde' : 'Vis totalt';
+
+          driverChart.data.datasets.forEach((ds, i) => {
+            ds.data = cumulative ? [...data.forere[i].poeng] : toPerRound(data.forere[i].poeng);
+          });
+          driverChart.update();
+
+          teamChart.data.datasets.forEach((ds, i) => {
+            ds.data = cumulative ? [...data.lag[i].poeng] : toPerRound(data.lag[i].poeng);
+          });
+          teamChart.update();
+        };
+      }
+
+      if (kalenderData) renderStats(computeStats(kalenderData, data));
+      renderDominance(data.forere);
     }
 
-    if (kalenderData) renderStats(computeStats(kalenderData, data));
-    renderDominance(data.forere);
+    seasonSelect.addEventListener('change', render);
+    render();
   });
 }

@@ -2,27 +2,39 @@ import { fetchData } from './api.js';
 import Chart from 'chart.js/auto';
 
 export function initHeadToHead() {
-  const sel1   = document.getElementById('h2hDriver1');
-  const sel2   = document.getElementById('h2hDriver2');
+  const sel1    = document.getElementById('h2hDriver1');
+  const sel2    = document.getElementById('h2hDriver2');
   const chartEl = document.getElementById('h2hChart');
   if (!sel1 || !sel2 || !chartEl) return;
 
-  fetchData('data/resultater.json').then(data => {
-    if (!data) return;
+  fetchData('data/resultater.json').then(allData => {
+    if (!allData) return;
 
-    const drivers = data.forere;
-
-    drivers.forEach((d, i) => {
-      sel1.add(new Option(d.navn, i));
-      sel2.add(new Option(d.navn, i));
-    });
-    sel2.selectedIndex = 1;
-
+    const seasonSelect = document.getElementById('seasonSelect');
     let chart = null;
 
+    function getSeasonData() {
+      const season = seasonSelect ? seasonSelect.value : Object.keys(allData).sort().reverse()[0];
+      return allData[season];
+    }
+
+    function populateDrivers(data) {
+      sel1.innerHTML = '';
+      sel2.innerHTML = '';
+      data.forere.forEach((d, i) => {
+        sel1.add(new Option(d.navn, i));
+        sel2.add(new Option(d.navn, i));
+      });
+      sel2.selectedIndex = Math.min(1, data.forere.length - 1);
+    }
+
     function update() {
-      const d1 = drivers[parseInt(sel1.value)];
-      const d2 = drivers[parseInt(sel2.value)];
+      const data = getSeasonData();
+      if (!data) return;
+
+      const d1 = data.forere[parseInt(sel1.value)];
+      const d2 = data.forere[parseInt(sel2.value)];
+      if (!d1 || !d2) return;
 
       if (chart) chart.destroy();
 
@@ -78,8 +90,18 @@ export function initHeadToHead() {
       });
     }
 
+    function onSeasonChange() {
+      const data = getSeasonData();
+      if (data) populateDrivers(data);
+      update();
+    }
+
+    if (seasonSelect) seasonSelect.addEventListener('change', onSeasonChange);
     sel1.addEventListener('change', update);
     sel2.addEventListener('change', update);
+
+    const initial = getSeasonData();
+    if (initial) populateDrivers(initial);
     update();
   });
 }

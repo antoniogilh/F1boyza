@@ -195,6 +195,20 @@ body {
 
 .card-header h2 { margin: 0; }
 
+/* ---- SEASON FILTER ---- */
+.season-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #777;
+}
+
 /* ---- SEASON SELECT ---- */
 .season-select {
   padding: 7px 12px;
