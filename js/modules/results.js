@@ -217,7 +217,10 @@ export function initResults() {
     const seasons = Object.keys(allData).sort().reverse();
 
     seasons.forEach(yr => seasonSelect.add(new Option(yr, yr)));
-    seasonSelect.value = seasons[0];
+
+    // Default to latest season that has actual data
+    const defaultSeason = seasons.find(yr => allData[yr].forere.some(f => f.poeng.length > 0)) || seasons[0];
+    seasonSelect.value = defaultSeason;
 
     let driverChart = null;
     let teamChart   = null;
