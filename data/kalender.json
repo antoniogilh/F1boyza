@@ -2,9 +2,9 @@
   "2025": [
     { "navn": "Bahrain",             "podium": "Frenzy Slam Dunk",                               "kjort": true },
     { "navn": "Saudi Arabia",        "podium": "Pole: Frenzy, Racevinner: Frenzy",               "kjort": true },
-    { "navn": "Australia",           "podium": "",                                                "kjort": false },
+    { "navn": "Australia",           "podium": "Pole: Frenzy, Racevinner Alonso",                "kjort": false },
     { "navn": "Japan",               "podium": "Pole: Frenzy, Racevinner: Frenzy",               "kjort": true },
-    { "navn": "China [Sprint]",      "podium": "",                                                "kjort": false },
+    { "navn": "China [Sprint]",      "podium": "Pole: Frenzy, Racevinner: Frenzy",               "kjort": false },
     { "navn": "Miami [Sprint]",      "podium": "Sprintvinner: Dave, Racevinner: Frenzy",         "kjort": true },
     { "navn": "Imola",               "podium": "Pole: Frenzy, Racevinner: Frenzy",               "kjort": true },
     { "navn": "Monaco",              "podium": "Pole: Frenzy, Racevinner: Gorba",                "kjort": true },
