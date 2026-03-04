@@ -77,17 +77,15 @@ function loadSeason(season) {
   }
 
   const races = kalenderData[season];
-  const nextIdx = races.findIndex(r => !r.kjort);
 
   let html = '';
   races.forEach((race, i) => {
     const isSprint = race.navn.includes('[Sprint]');
     const cleanName = race.navn.replace('[Sprint]', '').trim();
     const flag = getFlag(cleanName);
-    const isNext = i === nextIdx;
 
-    let statusClass = race.kjort ? 'done' : (isNext ? 'next-up' : 'not-done');
-    const statusIcon = race.kjort ? '✅' : (isNext ? '⏭️' : '🔴');
+    const statusClass = race.kjort ? 'done' : 'not-done';
+    const statusIcon = race.kjort ? '✅' : '🔴';
     const sprintBadge = isSprint ? `<span class="sprint-badge">Sprint</span>` : '';
     const podiumHtml = race.kjort && race.podium
       ? `<div class="podium">${formatPodium(race.podium)}</div>`

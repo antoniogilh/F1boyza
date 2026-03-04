@@ -334,13 +334,6 @@ footer {
   color: #ccc;
 }
 
-.race.next-up {
-  background: linear-gradient(135deg, #2a1c00, #1a1100);
-  border-left: 3px solid #e68a00;
-  color: white;
-  box-shadow: 0 0 14px rgba(230,138,0,0.18);
-}
-
 .sprint-badge {
   font-size: 0.68rem;
   font-weight: 700;
