@@ -6,7 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 F1 BOYZA is a Norwegian-language static website for tracking an F1 fantasy league among friends. It displays race calendars, driver/team standings with charts, penalty points, a "spin the wheel" feature for selecting the next race, and various fun/stats features.
 
-**Players (nicknames used throughout):** Frenzy, Gorba, Antonio, Dave
+**Players:** Shaya, Philip, Antonio, Gorba, Dave, William
+
+Some players appear under more than one name in older data: **Gorba = Oddi**, and podium text in `kalender.json` 2025 uses the nicknames Frenzy and Cabra. `resultater.json` 2025 uses `Oddi`; 2026 onwards uses `Gorba`. This mismatch means win/pole lookups (modal, fun stats) only match players whose podium name equals their `resultater.json` name.
+
+**2026 teams:** Ferrari (Shaya, Philip) · Red Bull (Antonio, Gorba) · Mercedes (Dave, William)
 
 ## Commands
 
@@ -34,7 +38,8 @@ No test suite is configured.
 - `js/modules/headtohead.js` — head-to-head comparison chart on `resultater.html`, fetches `data/resultater.json`
 - `js/modules/modal.js` — driver profile modal (injected into DOM). Called by `results.js` on driver row click. Shows points, wins, poles, best/worst round
 - `js/modules/penalties.js` — horizontal bar chart + penalty table on `straff.html`, fetches `data/straff.json`. Worst offender gets a pulsing 🚨 SKAM badge
-- `js/modules/wheel.js` — canvas spin wheel on `Spinthatshit.html`, fetches `data/kalender.json`. Fires confetti (`canvas-confetti`) and Web Audio tick sounds on spin
+- `js/modules/wheel.js` — canvas spin wheel on `Spinthatshit.html`, fetches `data/kalender.json`. Fires confetti (`canvas-confetti`) and Web Audio tick sounds on spin. No season selector: it always uses the newest season in the calendar and only offers races with `kjort: false`. Rotation accumulates across spins and the button is disabled while spinning
+- `js/modules/season.js` — no DOM; converts `resultater.json` from per-race points to cumulative and derives team points from driver pairs. Used by `results.js` and `headtohead.js`
 - `js/modules/sound.js` — Web Audio API tick sound generator used by wheel. No audio files required
 
 ### Data Files (`data/`)
@@ -51,28 +56,38 @@ JSON files fetched client-side at runtime.
 { "2026": [{ "runde": "R1", "dato": "2026-03-22" }, ...] }
 ```
 
-**`data/resultater.json`** — cumulative fantasy points:
+**`data/resultater.json`** — fantasy points **per race**, keyed by season:
 ```json
 {
-  "runder": ["R1", "R2", ...],
-  "forere": [{ "navn": "Antonio", "poeng": [7, 7, 22, ...] }],
-  "lag":    [{ "navn": "Ferrari", "poeng": [15, 23, 49, ...] }]
+  "2026": {
+    "runder": ["R1", "R2", ...],
+    "lag":    [{ "navn": "Ferrari", "farge": "#e8002d", "forere": ["Shaya", "Philip"] }],
+    "forere": [{ "navn": "Shaya", "lag": "Ferrari", "poeng": [25, 18, ...] }]
+  }
 }
 ```
-Points arrays are cumulative totals. `poeng[last]` is the season total.
+`poeng[i]` is what that player scored in race `i` — **not** a running total. To record a race, append one number per driver; nothing else needs updating.
+
+A team with no `poeng` list gets its points summed from the drivers in `forere` (this is how 2026 works). A team that *has* a `poeng` list keeps it — 2025 does, because its two-team points don't equal the driver sums.
+
+`js/modules/season.js` converts per-race → cumulative once at load via `normaliserSesonger()`, so `results.js`, `modal.js` and `headtohead.js` all keep working with running totals (`poeng[last]` = season total). **Any new module reading this file must run it through `normaliserSesonger()` first.**
+
+Note the array order is the order races were actually driven (chosen by the wheel), which is not calendar order.
 
 **`data/straff.json`** — penalty points:
 ```json
 { "penaltyPoints": [{ "fører": "Antonio", "poeng": 1, "runde": "R3", "beskrivelse": "..." }] }
 ```
 
-### Player colors (used for avatars in standings + chart datasets)
+### Player colors (used for avatars in standings)
 ```js
-Frenzy:  '#990000'  // red
-Gorba:   '#22c55e'  // green
-Antonio: '#8b5cf6'  // purple
-Dave:    '#eab308'  // yellow
+Frenzy:  '#990000'  // red        Shaya:   '#e8002d'
+Gorba:   '#22c55e'  // green      Oddi:    '#22c55e'
+Antonio: '#8b5cf6'  // purple     Philip:  '#f97316'
+Dave:    '#eab308'  // yellow     William: '#06b6d4'
 ```
+
+Chart lines are coloured by **team** where the season defines teams (`lag[].farge`), with the second driver in each pair drawn dashed. Seasons without team membership fall back to the generic `COLORS` palette.
 Defined as `PLAYER_COLORS` in `results.js`.
 
 ### Styling

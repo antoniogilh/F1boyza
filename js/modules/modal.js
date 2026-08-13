@@ -1,3 +1,5 @@
+import { total } from './season.js';
+
 let modalEl = null;
 
 function createModal() {
@@ -38,18 +40,16 @@ export function showDriverModal(driver, allDrivers, kalenderData, rounds) {
     });
   });
 
-  const sorted = [...allDrivers].sort((a, b) =>
-    b.poeng[b.poeng.length - 1] - a.poeng[a.poeng.length - 1]
-  );
-  const pos   = sorted.findIndex(d => d.navn === driver.navn) + 1;
-  const total = driver.poeng[driver.poeng.length - 1];
+  const sorted = [...allDrivers].sort((a, b) => total(b.poeng) - total(a.poeng));
+  const pos      = sorted.findIndex(d => d.navn === driver.navn) + 1;
+  const totalSum = total(driver.poeng);
 
-  let bestRound  = { points: -Infinity, round: '—' };
-  let worstRound = { points: Infinity,  round: '—' };
+  let bestRound  = { points: 0, round: '—' };
+  let worstRound = { points: 0, round: '—' };
   driver.poeng.forEach((val, i) => {
     const delta = i === 0 ? val : val - driver.poeng[i - 1];
-    if (delta > bestRound.points)  bestRound  = { points: delta, round: rounds[i] || `R${i + 1}` };
-    if (delta < worstRound.points) worstRound = { points: delta, round: rounds[i] || `R${i + 1}` };
+    if (i === 0 || delta > bestRound.points)  bestRound  = { points: delta, round: rounds[i] || `R${i + 1}` };
+    if (i === 0 || delta < worstRound.points) worstRound = { points: delta, round: rounds[i] || `R${i + 1}` };
   });
 
   const medals     = ['🥇', '🥈', '🥉'];
@@ -64,7 +64,7 @@ export function showDriverModal(driver, allDrivers, kalenderData, rounds) {
     </div>
     <div class="modal-stats-grid">
       <div class="modal-stat">
-        <span class="modal-stat-val">${total}</span>
+        <span class="modal-stat-val">${totalSum}</span>
         <span class="modal-stat-label">Totalt</span>
       </div>
       <div class="modal-stat">

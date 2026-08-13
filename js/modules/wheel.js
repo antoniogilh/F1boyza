@@ -6,6 +6,8 @@ let kalenderData = {};
 let segments = [];
 let wheelCanvas = null;
 let ctx = null;
+let rotasjon = 0;   // hjulets nåværende vinkel, så neste spinn fortsetter derfra
+let spinner = false;
 
 const COLORS = [
   '#c0392b', '#1a6b3a', '#1565c0', '#7b1fa2',
@@ -14,46 +16,53 @@ const COLORS = [
 
 export function initWheel() {
   wheelCanvas = document.getElementById('wheel');
-  const seasonSelect = document.getElementById('season');
   const spinBtn      = document.getElementById('spinBtn');
   const resultDiv    = document.getElementById('result');
+  const seasonLabel  = document.getElementById('wheelSeason');
 
-  if (!wheelCanvas || !seasonSelect || !spinBtn) return;
+  if (!wheelCanvas || !spinBtn) return;
 
   ctx = wheelCanvas.getContext('2d');
 
   fetchData('data/kalender.json').then(data => {
     if (!data) return;
     kalenderData = data;
-    updateSegments(seasonSelect.value);
-    drawWheel();
-  });
 
-  seasonSelect.addEventListener('change', e => {
-    updateSegments(e.target.value);
+    // Hjulet gjelder alltid sesongen som pågår — den nyeste i kalenderen.
+    const season = Object.keys(kalenderData).sort().pop();
+    if (seasonLabel) seasonLabel.textContent = season;
+
+    updateSegments(season);
     drawWheel();
-    if (resultDiv) resultDiv.textContent = '';
   });
 
   spinBtn.addEventListener('click', () => {
     resumeAudio(); // unlock AudioContext on user gesture
+
+    if (spinner) return;
 
     if (segments.length === 0) {
       if (resultDiv) resultDiv.textContent = 'Ingen ubegynte baner igjen!';
       return;
     }
 
+    // Start der hjulet står, ellers hopper det tilbake til utgangspunktet.
+    const fra         = rotasjon;
     const totalSpin   = Math.random() * 360 + 1440;
     const duration    = 7000;
     const segAngle    = 360 / segments.length;
     let start         = null;
     let lastTickSeg   = -1;
 
+    spinner = true;
+    spinBtn.disabled = true;
+    if (resultDiv) resultDiv.textContent = '';
+
     function animate(timestamp) {
       if (!start) start = timestamp;
-      const progress = timestamp - start;
-      const ease     = 1 - Math.pow(1 - Math.min(progress / duration, 1), 3);
-      const angle    = totalSpin * ease;
+      const progress = Math.min(timestamp - start, duration);
+      const ease     = 1 - Math.pow(1 - progress / duration, 3);
+      const angle    = fra + totalSpin * ease;
 
       wheelCanvas.style.transform = `rotate(${angle}deg)`;
 
@@ -68,12 +77,17 @@ export function initWheel() {
       if (progress < duration) {
         requestAnimationFrame(animate);
       } else {
-        const finalAngle    = angle % 360;
-        const adjustedAngle = (finalAngle + 90) % 360;
+        rotasjon = angle % 360;
+        wheelCanvas.style.transform = `rotate(${rotasjon}deg)`;
+
+        const adjustedAngle = (rotasjon + 90) % 360;
         const index = Math.floor((segments.length - (adjustedAngle / segAngle)) % segments.length);
         const winner = segments[index];
 
         if (resultDiv) resultDiv.textContent = `🏁 ${winner}`;
+
+        spinner = false;
+        spinBtn.disabled = false;
 
         confetti({
           particleCount: 120,

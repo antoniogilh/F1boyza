@@ -1,5 +1,6 @@
 import { fetchData } from './api.js';
 import Chart from 'chart.js/auto';
+import { normaliserSesonger, total } from './season.js';
 
 export function initHeadToHead() {
   const sel1    = document.getElementById('h2hDriver1');
@@ -7,8 +8,11 @@ export function initHeadToHead() {
   const chartEl = document.getElementById('h2hChart');
   if (!sel1 || !sel2 || !chartEl) return;
 
-  fetchData('data/resultater.json').then(allData => {
-    if (!allData) return;
+  fetchData('data/resultater.json').then(rawData => {
+    if (!rawData) return;
+
+    // Datafila er per løp; grafen viser løpende totaler.
+    const allData = normaliserSesonger(rawData);
 
     const seasonSelect = document.getElementById('seasonSelect');
     let chart = null;
@@ -38,11 +42,13 @@ export function initHeadToHead() {
 
       if (chart) chart.destroy();
 
-      const gap = d1.poeng[d1.poeng.length - 1] - d2.poeng[d2.poeng.length - 1];
+      const gap = total(d1.poeng) - total(d2.poeng);
       const gapEl = document.getElementById('h2hGap');
       if (gapEl) {
         const leader = gap >= 0 ? d1.navn : d2.navn;
-        gapEl.textContent = `${leader} leder med ${Math.abs(gap)} poeng`;
+        gapEl.textContent = gap === 0
+          ? 'Helt likt – ingen av dem har noe å skryte av ennå'
+          : `${leader} leder med ${Math.abs(gap)} poeng`;
       }
 
       chart = new Chart(chartEl, {

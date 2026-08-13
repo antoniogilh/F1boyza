@@ -1,6 +1,7 @@
 import { fetchData } from './api.js';
 import Chart from 'chart.js/auto';
 import { showDriverModal } from './modal.js';
+import { normaliserSesonger, lagTilForer, total } from './season.js';
 
 const COLORS = ['#990000', '#FFD700', '#00b4d8', '#ff6b35', '#7fff7f', '#ff69b4', '#b388ff', '#80deea'];
 
@@ -9,6 +10,10 @@ const PLAYER_COLORS = {
   Gorba:   '#22c55e',
   Antonio: '#8b5cf6',
   Dave:    '#eab308',
+  Shaya:   '#e8002d',
+  Oddi:    '#22c55e',
+  Philip:  '#f97316',
+  William: '#06b6d4',
 };
 
 const CHART_OPTIONS = {
@@ -63,25 +68,25 @@ function playerAvatar(name) {
 }
 
 function buildTable(tableEl, entries, allDrivers, kalenderData, rounds) {
-  const sorted = [...entries].sort((a, b) =>
-    b.poeng[b.poeng.length - 1] - a.poeng[a.poeng.length - 1]
-  );
-  const leaderTotal = sorted[0].poeng[sorted[0].poeng.length - 1];
+  const sorted = [...entries].sort((a, b) => total(b.poeng) - total(a.poeng));
+  const leaderTotal = total(sorted[0].poeng);
+  // Før første løp står alle likt — da gir medaljer og «Leader» ingen mening.
+  const sesongStartet = leaderTotal > 0;
 
   let html = '';
   sorted.forEach((entry, idx) => {
-    const total    = entry.poeng[entry.poeng.length - 1];
-    const gap      = idx === 0 ? '—' : `-${leaderTotal - total}p`;
-    const posClass = idx < 3 ? `pos-${idx + 1}` : '';
-    const posIcon  = idx < 3 ? MEDALS[idx] : `${idx + 1}`;
-    const badge    = idx === 0 ? `<span class="leader-badge">Leader</span>` : '';
+    const sum      = total(entry.poeng);
+    const gap      = idx === 0 || !sesongStartet ? '—' : `-${leaderTotal - sum}p`;
+    const posClass = sesongStartet && idx < 3 ? `pos-${idx + 1}` : '';
+    const posIcon  = sesongStartet && idx < 3 ? MEDALS[idx] : `${idx + 1}`;
+    const badge    = sesongStartet && idx === 0 ? `<span class="leader-badge">Leader</span>` : '';
     const avatar   = playerAvatar(entry.navn);
 
     html += `
       <tr class="${posClass}" data-driver="${entry.navn}" style="cursor:pointer" title="Klikk for stats">
         <td class="pos-cell">${posIcon}</td>
         <td class="name-cell">${avatar}${entry.navn}${badge}</td>
-        <td class="points-cell">${total}</td>
+        <td class="points-cell">${sum}</td>
         <td class="gap-cell">${gap}</td>
       </tr>
     `;
@@ -165,15 +170,19 @@ function renderDominance(forere) {
   const el = document.getElementById('dominanceMeter');
   if (!el) return;
 
-  const sorted = [...forere].sort((a, b) =>
-    b.poeng[b.poeng.length - 1] - a.poeng[a.poeng.length - 1]
-  );
+  const sorted = [...forere].sort((a, b) => total(b.poeng) - total(a.poeng));
   if (sorted.length < 2) return;
 
   const leader = sorted[0];
   const last   = sorted[sorted.length - 1];
-  const gap    = leader.poeng[leader.poeng.length - 1] - last.poeng[last.poeng.length - 1];
-  const max    = leader.poeng[leader.poeng.length - 1];
+  const max    = total(leader.poeng);
+  const gap    = max - total(last.poeng);
+
+  // Ingen løp kjørt ennå – tomme søylediagram og «X leder med 0» sier ingenting.
+  if (max === 0) {
+    el.innerHTML = '<p class="dom-label">Sesongen har ikke startet. Alt er fortsatt mulig, selv for Dave.</p>';
+    return;
+  }
 
   let phraseIdx;
   if (gap === 0)      phraseIdx = 0;
@@ -183,7 +192,7 @@ function renderDominance(forere) {
   else                phraseIdx = 4;
 
   const bars = sorted.map(d => {
-    const pts = d.poeng[d.poeng.length - 1];
+    const pts = total(d.poeng);
     const pct = Math.round((pts / max) * 100);
     return `
       <div class="dom-row">
@@ -210,8 +219,11 @@ export function initResults() {
   Promise.all([
     fetchData('data/resultater.json'),
     fetchData('data/kalender.json'),
-  ]).then(([allData, kalenderData]) => {
-    if (!allData) return;
+  ]).then(([rawData, kalenderData]) => {
+    if (!rawData) return;
+
+    // Datafila er per løp; her og videre jobber vi med løpende totaler.
+    const allData = normaliserSesonger(rawData);
 
     const seasonSelect = document.getElementById('seasonSelect');
     const seasons = Object.keys(allData).sort().reverse();
@@ -244,11 +256,15 @@ export function initResults() {
         data: {
           labels: data.runder,
           datasets: data.forere.map((f, i) => {
-            const color = COLORS[i % COLORS.length];
+            // Førere arver lagfargen; makkeren får stiplet linje så de kan skilles.
+            const lag   = lagTilForer(data, f.navn);
+            const color = (lag && lag.farge) || COLORS[i % COLORS.length];
+            const erMakker = lag ? (lag.forere || []).indexOf(f.navn) > 0 : false;
             return {
               label: f.navn, data: [...f.poeng], tension: 0,
               borderWidth: 3, pointRadius: 4, pointHoverRadius: 6,
               borderColor: color,
+              borderDash: erMakker ? [7, 5] : [],
               backgroundColor: makeGradient(driverCtx, color),
               fill: true,
             };
@@ -264,7 +280,7 @@ export function initResults() {
         data: {
           labels: data.runder,
           datasets: data.lag.map((l, i) => {
-            const color = COLORS[i % COLORS.length];
+            const color = l.farge || COLORS[i % COLORS.length];
             return {
               label: l.navn, data: [...l.poeng], tension: 0,
               borderWidth: 3, pointRadius: 4, pointHoverRadius: 6,

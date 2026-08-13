@@ -1,3 +1,5 @@
+import { fetchData } from './api.js';
+
 const TRASH_TALK = {
   Dave: [
     "Dave er ikke dårlig. Han er... særegen.",
@@ -98,6 +100,35 @@ function initTrashTalk() {
   });
 }
 
+// Lagoppstillingen hentes fra resultatdataen, så forsiden aldri kommer i
+// utakt med tabellene på resultatsiden.
+function initLineup() {
+  const container = document.getElementById('lineup');
+  if (!container) return;
+
+  fetchData('data/resultater.json').then(allData => {
+    if (!allData) return;
+
+    const season = Object.keys(allData).sort().pop();
+    const sesong = allData[season];
+    if (!sesong) return;
+
+    const label = document.getElementById('lineupSeason');
+    if (label) label.textContent = season;
+
+    container.innerHTML = sesong.lag.map(lag => {
+      const forere = (lag.forere || []).map(f => `<span>${f}</span>`).join('');
+      return `
+        <div class="team" style="border-left-color:${lag.farge}">
+          <h3 class="team-name" style="color:${lag.farge}">${lag.navn}</h3>
+          <div class="drivers">${forere}</div>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
 export function initHomepage() {
   initTrashTalk();
+  initLineup();
 }
