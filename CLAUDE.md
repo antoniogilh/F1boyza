@@ -35,7 +35,7 @@ No test suite is configured.
 - `js/modules/slider.js` — fade image carousel on `index.html`
 - `js/modules/homepage.js` — index.html-only: team-radio trash talk generator + the starting grid. The grid orders drivers by championship position, or by file order before the season starts
 - `js/modules/calendar.js` — race calendar on `kalender.html`, fetches `data/kalender.json`. Shows country flags, round numbers (`R01`), sprint badges, run/not-run state, staggered fade-in animation
-- `js/modules/dates.js` — race dates table on `kalender.html`, fetches `data/datoer.json`. Day-resolution comparison, same as the countdown
+- `js/modules/dates.js` — race dates table on `kalender.html`, fetches `data/datoer.json`. Day-resolution comparison, same as the countdown. Rounds with `dato: null` are collapsed into a single trailing summary row (`R2–R24 · Dato ikke satt`), so an unplanned season is two rows instead of twenty-four identical ones. The range label is only used when the undated rounds are actually contiguous
 - `js/modules/results.js` — Chart.js line charts (straight lines, gradient fill) + timing-tower standings tables (position, code with team colour bar, name, points, gap) + season records + dominance meter on `resultater.html`. Fetches both `data/resultater.json` and `data/kalender.json`. Rows are clickable (opens modal)
 - `js/modules/headtohead.js` — head-to-head comparison chart on `resultater.html`, fetches `data/resultater.json`
 - `js/modules/modal.js` — driver profile modal (injected into DOM). Called by `results.js` on driver row click. Shows points, wins, poles, best/worst round

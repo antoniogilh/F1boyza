@@ -320,6 +320,18 @@ body {
 /* Tabeller får rulle i sin egen boks, aldri hele siden. */
 .table-wrap { overflow-x: auto; }
 
+/* Tomme tilstander og feilmeldinger står rett i panelet, som ikke har
+   egen padding. Uten dette klistrer teksten seg til kanten. */
+.empty-note,
+#calendar > p,
+#datesTable > p,
+#raceControl > p {
+  margin: 0;
+  padding: 18px;
+  font-size: 0.95rem;
+  color: var(--dim);
+}
+
 /* ---- PANEL ---- */
 .panel {
   background: var(--panel);
@@ -913,8 +925,12 @@ button#spinBtn {
 .dates-table .status-cell.past     { color: var(--dimmer); }
 .dates-table .status-cell.next     { color: var(--yellow); }
 .dates-table .status-cell.upcoming { color: var(--dim); }
-.dates-table .status-cell.tbd      { color: var(--dimmer); }
-.dates-table .tbd-date             { color: var(--dimmer); }
+
+/* Samleraden for runder uten dato er et sammendrag, ikke en runde. */
+.dates-table .undated-row td {
+  color: var(--dimmer);
+  border-top: 1px solid var(--rule);
+}
 
 .next-date-row td { background: rgba(255, 211, 32, 0.05); }
 
