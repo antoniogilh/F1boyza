@@ -4,3 +4,6 @@
 node_modules
 dist
 .cache
+
+# Lokale Claude Code-tillatelser, ikke delt med resten av repoet
+.claude/settings.local.json
