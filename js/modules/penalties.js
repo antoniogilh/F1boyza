@@ -1,5 +1,14 @@
 import { fetchData } from './api.js';
 import Chart from 'chart.js/auto';
+import { kode } from './codes.js';
+
+const CHART_FONT = { family: 'Martian Mono, ui-monospace, monospace', size: 10 };
+
+/** «R21» → 21, så meldingene kan sorteres med siste hendelse øverst. */
+function rundeNr(runde) {
+  const m = String(runde || '').match(/\d+/);
+  return m ? parseInt(m[0], 10) : 0;
+}
 
 export function initPenalties() {
   const tbody = document.querySelector('#penaltyTable tbody');
@@ -7,7 +16,7 @@ export function initPenalties() {
 
   fetchData('data/straff.json').then(data => {
     if (!data) {
-      tbody.innerHTML = '<tr><td colspan="2">Kunne ikke laste straffedata.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5">Kunne ikke laste straffedata.</td></tr>';
       return;
     }
 
@@ -21,56 +30,82 @@ export function initPenalties() {
     const sorted = Object.entries(grouped).sort((a, b) => b[1].total - a[1].total);
     const worstDriver = sorted[0]?.[0];
 
-    // Bar chart
-    const chartEl = document.getElementById('penaltyChart');
-    if (chartEl) {
-      new Chart(chartEl, {
-        type: 'bar',
-        data: {
-          labels: sorted.map(([name]) => name),
-          datasets: [{
-            label: 'Penalty Points',
-            data: sorted.map(([, g]) => g.total),
-            backgroundColor: sorted.map(([name]) =>
-              name === worstDriver ? 'rgba(153,0,0,0.9)' : 'rgba(153,0,0,0.4)'
-            ),
-            borderColor: '#990000',
-            borderWidth: 1,
-            borderRadius: 5,
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { color: '#777', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true },
-            y: { ticks: { color: '#ccc', font: { family: 'Barlow Condensed, sans-serif', size: 15, weight: 'bold' } }, grid: { color: 'rgba(255,255,255,0.04)' } }
-          }
-        }
-      });
-    }
-
-    // Table with shame badge on worst offender
-    let rowsHtml = '';
-    sorted.forEach(([fører, g]) => {
-      const isWorst   = fører === worstDriver;
-      const shameBadge = isWorst
-        ? `<span class="shame-badge">🚨 Skam</span>`
-        : '';
-
-      let eventsHtml = '';
-      g.events.forEach(e => {
-        eventsHtml += `<div><strong>${e.poeng}p</strong> – ${e.runde}: ${e.beskrivelse}</div>`;
-      });
-
-      rowsHtml += `
-        <tr>
-          <td>${fører} (${g.total}p) ${shameBadge}</td>
-          <td>${eventsHtml}</td>
-        </tr>
-      `;
-    });
-    tbody.innerHTML = rowsHtml;
+    renderChart(sorted, worstDriver);
+    renderTable(tbody, sorted, worstDriver);
+    renderRaceControl(data.penaltyPoints);
   });
+}
+
+function renderChart(sorted, worstDriver) {
+  const chartEl = document.getElementById('penaltyChart');
+  if (!chartEl) return;
+
+  new Chart(chartEl, {
+    type: 'bar',
+    data: {
+      labels: sorted.map(([name]) => kode(name)),
+      datasets: [{
+        label: 'Straffepoeng',
+        data: sorted.map(([, g]) => g.total),
+        backgroundColor: sorted.map(([name]) =>
+          name === worstDriver ? 'rgba(255,45,26,0.85)' : 'rgba(255,45,26,0.28)'
+        ),
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: { color: '#47536a', stepSize: 1, font: CHART_FONT },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+        },
+        y: {
+          ticks: { color: '#e9eff8', font: { ...CHART_FONT, size: 11, weight: '700' } },
+          grid: { display: false },
+        }
+      }
+    }
+  });
+}
+
+function renderTable(tbody, sorted, worstDriver) {
+  tbody.innerHTML = sorted.map(([forer, g], i) => {
+    const badge = forer === worstDriver
+      ? `<span class="shame-badge">Skam</span>`
+      : '';
+    return `
+      <tr>
+        <td class="pos-cell">${i + 1}</td>
+        <td class="code-cell"><span class="team-bar" style="--team:var(--red-hot)"></span>${kode(forer)}</td>
+        <td class="name-cell">${forer}${badge}</td>
+        <td class="points-cell">${g.events.length}</td>
+        <td class="penalty-total">${g.total}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderRaceControl(hendelser) {
+  const el = document.getElementById('raceControl');
+  if (!el) return;
+
+  // Dokumentnummer følger kronologien; lista viser siste melding øverst.
+  const kronologisk = [...hendelser].sort((a, b) => rundeNr(a.runde) - rundeNr(b.runde));
+  const nummerert = kronologisk.map((h, i) => ({ ...h, doc: i + 1 }));
+
+  el.innerHTML = [...nummerert].reverse().map(h => `
+    <article class="rc-msg">
+      <div class="rc-head">
+        <span>Dok ${String(h.doc).padStart(2, '0')}</span>
+        <span>${h.runde}</span>
+        <span class="rc-car">Bil ${kode(h.fører)}</span>
+        <span class="rc-pen">${h.poeng} straffepoeng</span>
+      </div>
+      <p class="rc-body">${h.beskrivelse}</p>
+    </article>
+  `).join('');
 }

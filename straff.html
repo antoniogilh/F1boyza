@@ -7,16 +7,18 @@
   <title>F1 BOYZA – Skammelig kjøring</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@100..150,700..900&family=Archivo:wght@400;500;600&family=Martian+Mono:wdth,wght@87.5..112.5,300..700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<header class="hero small">
-  <div class="overlay">
-    <h1>Penalty Points</h1>
-    <p>Hvem har tråkket i salaten?</p>
+<div class="statusbar">
+  <div class="status-session">
+    <span>Sesong <b id="statusSeason">—</b></span>
+    <span>Runde <b id="statusRound">—</b></span>
   </div>
-</header>
+  <span class="status-flag idle" id="statusFlag">Laster</span>
+</div>
+
 <nav class="topnav">
   <div class="menu-toggle">☰</div>
   <div class="nav-links" id="navLinks">
@@ -27,23 +29,47 @@
     <a href="Spinthatshit.html">Spin that SHIIIT</a>
   </div>
 </nav>
+
+<header class="page-head">
+  <span class="eyebrow">Straffepoeng</span>
+  <h1>Skammelig kjøring</h1>
+  <p>Alt som er meldt inn til race control. Poengene står på rullebladet resten av sesongen.</p>
+</header>
+
 <main class="container single">
-  <section class="card">
-    <h2>Oversikt over penalty points per fører</h2>
-    <div class="penalty-chart-wrap">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Rulleblad</h2>
+      <span class="panel-meta">Poeng per fører</span>
+    </div>
+    <div class="panel-body penalty-chart-wrap">
       <canvas id="penaltyChart"></canvas>
     </div>
-    <table id="penaltyTable">
-      <thead>
-      <tr>
-        <th>Fører og poeng total</th>
-        <th>Poeng og Hendelser</th>
-      </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="table-wrap">
+      <table id="penaltyTable" class="standings-table">
+        <thead>
+        <tr>
+          <th>Pos</th>
+          <th>Kode</th>
+          <th>Fører</th>
+          <th style="text-align:right">Hendelser</th>
+          <th style="text-align:right">Poeng</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Race control</h2>
+      <span class="panel-meta">Meldinger</span>
+    </div>
+    <div id="raceControl" class="rc-list"></div>
   </section>
 </main>
+
 <footer>© F1 BOYZA</footer>
 
 <script src="js/app.js"></script>

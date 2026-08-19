@@ -43,7 +43,11 @@ function formatPodium(podiumStr) {
   if (!podiumStr || !podiumStr.trim()) return '';
   return podiumStr
     .split(/,\s*/)
-    .map(part => `<span class="podium-item">${part.trim()}</span>`)
+    .map(part => {
+      const [label, ...rest] = part.split(':');
+      if (!rest.length) return `<span class="podium-item">${part.trim()}</span>`;
+      return `<span class="podium-item"><span class="podium-key">${label.trim()}</span>${rest.join(':').trim()}</span>`;
+    })
     .join('');
 }
 
@@ -85,7 +89,7 @@ function loadSeason(season) {
     const flag = getFlag(cleanName);
 
     const statusClass = race.kjort ? 'done' : 'not-done';
-    const statusIcon = race.kjort ? '✅' : '🔴';
+    const statusText  = race.kjort ? 'Kjørt' : 'Ikke kjørt';
     const sprintBadge = isSprint ? `<span class="sprint-badge">Sprint</span>` : '';
     const podiumHtml = race.kjort && race.podium
       ? `<div class="podium">${formatPodium(race.podium)}</div>`
@@ -93,16 +97,16 @@ function loadSeason(season) {
 
     html += `
       <div class="race ${statusClass}">
-        <div class="race-num">#${i + 1}</div>
+        <div class="race-num">R${String(i + 1).padStart(2, '0')}</div>
         <div class="race-flag">${flag}</div>
         <div class="race-body">
           <div class="race-title-row">
             <span class="race-name">${cleanName}</span>
             ${sprintBadge}
-            <span class="race-status">${statusIcon}</span>
           </div>
           ${podiumHtml}
         </div>
+        <div class="race-status">${statusText}</div>
       </div>
     `;
   });

@@ -1,4 +1,6 @@
 import { fetchData } from './api.js';
+import { kode } from './codes.js';
+import { lagTilForer } from './season.js';
 
 const TRASH_TALK = {
   Dave: [
@@ -47,19 +49,55 @@ const TRASH_TALK = {
     "Gorba er en tikkende bombe i en garasje full av biler.",
     "Gorba sin racingfilosofi: enten vinner du, eller du tar med deg noen i fallet.",
   ],
-  Frenzy: [
-    "Frenzy vinner fortsatt, men han begynner å bli kjedelig å heie på.",
-    "Frenzy er så god at resten av gjengen vurderer å bytte spill.",
-    "Frenzy er arrogant. Igjen: med god grunn, men fortsatt.",
-    "Frenzy tror han er Max Verstappen. Kanskje han faktisk er det.",
-    "Frenzy vinner ikke alltid. Men når han taper vet alle at det er en anomali.",
-    "Frenzy er grunnen til at de andre spiller. De håper på at han tar feil.",
-    "Frenzy er statistisk sett umulig å slå. Og allikevel er han der hver runde.",
-    "Frenzy er ikke heldig. Han er bare bedre. Det er verre.",
-    "Å tape mot Frenzy er blitt en rituell opplevelse for resten av gjengen.",
-    "Frenzy sin worst-case er de andres best-case.",
-    "Frenzy trenger ikke trash talk. Poengene taler for seg selv.",
-    "De andre spiller for andreplassen. Frenzy vet ikke at det finnes en.",
+  William: [
+    "William er ny, men skuffelsen føles allerede godt etablert.",
+    "William har rookie-unnskyldningen. Den varer ikke ut sesongen.",
+    "William kjører som om han fortsatt leser reglementet underveis.",
+    "William har ambisjoner. De er betydelig større enn poengsummen.",
+    "William lærer fort. Bare ikke fort nok.",
+    "William er Mercedes sin fremtid. Fremtiden ligger et godt stykke frem.",
+    "William stiller alltid opp. Resultatene gjør det sjeldnere.",
+    "William har allerede lært det viktigste: hvordan man forklarer et dårlig løp.",
+    "William er uforutsigbar. Det er både styrken hans og hele problemet.",
+    "William har fart. Retningen er det verre med.",
+    "William er lagkameraten til Dave. Det er straff nok i seg selv.",
+    "William blir bedre for hvert løp. Fra et bemerkelsesverdig lavt utgangspunkt.",
+    "William sin sesong beskrives best som en læringsprosess. Det er pent sagt.",
+    "William tok ikke feil valg. Han tok alle sammen.",
+  ],
+  Philip: [
+    "Philip sin pre-race rutine er kylling. Post-race rutine: også kylling.",
+    "Philip valgte lag basert på hvem som hadde best kylling i hospitality.",
+    "Philip har spist mer kylling denne sesongen enn han har scoret poeng.",
+    "Philip sin strategi er kyllingbasert. Den er like uklar som den høres ut.",
+    "Philip bytter gjerne en raceseier mot en halv grillkylling.",
+    "Philip sin box-radio består av ett ord, ropt tre ganger: KYLLING.",
+    "Philip ser på F1 for pit stop-pausene. Da rekker han en kyllingwrap.",
+    "Philip sin fantasy-strategi lukter kylling. Bokstavelig talt.",
+    "Philip har regnet ut at én raceseier tilsvarer fjorten kyllingfileter. Det er det eneste han har regnet ut.",
+    "Philip sin garasje er ikke en garasje. Det er en rotisserie.",
+    "Philip vil ha DRS på kyllingen også. Raskere levering.",
+    "Philip mistet fokus i R3 fordi noen nevnte kylling. Det er hele forklaringen.",
+    "Philip er rask i pitlane. Enda raskere i kyllingkøen.",
+    "Philip sin drømmesponsor er ikke Red Bull. Det er en kyllinggård.",
+    "Philip forhandler alltid om kontrakt. Betalingen skal være i kylling.",
+    "Philip er ikke sulten på seier. Han er bare sulten.",
+    "Philip er kyllingdrevet. Bilen er dessverre ikke det.",
+    "Philip sitt eneste konsekvente resultat er kyllingforbruket.",
+  ],
+  Shaya: [
+    "Shaya leder. Shaya vet at han leder. Alle vet at Shaya vet det.",
+    "Shaya vinner med en selvfølgelighet som er direkte provoserende.",
+    "Shaya kjører for Ferrari. Endelig et lag som matcher selvtilliten.",
+    "Shaya sin verste runde er fortsatt bedre enn Dave sin beste.",
+    "Shaya trenger ikke flaks. Det er nettopp det som er irriterende.",
+    "Shaya snakker ikke trash. Han lar tabellen gjøre det for seg.",
+    "Shaya er grunnen til at de andre åpner resultatsiden med frykt.",
+    "Shaya har funnet formelen. Han deler den ikke.",
+    "Shaya taper av og til. Det regnes som en nyhetssak.",
+    "Shaya sin selvtillit har egen startplass på grid.",
+    "Å slå Shaya er ikke lenger et mål. Det er en fantasi.",
+    "Shaya er stabil, rask og uutholdelig. I den rekkefølgen.",
   ],
   Antonio: [
     "Antonio er stabil. Stabilt i nedoverbakke.",
@@ -77,12 +115,24 @@ const TRASH_TALK = {
   ],
 };
 
+// Sannsynlighet i prosent for hvem som blir utpekt. Må summere til 100.
+const VEKTER = {
+  Dave:    25,
+  William: 25,
+  Philip:  25,
+  Gorba:   10,
+  Shaya:   10,
+  Antonio:  5,
+};
+
 function weightedPick() {
-  const r = Math.random();
-  if (r < 0.50) return 'Dave';
-  if (r < 0.80) return 'Gorba';
-  if (r < 0.90) return 'Frenzy';
-  return 'Antonio';
+  const total = Object.values(VEKTER).reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (const [navn, vekt] of Object.entries(VEKTER)) {
+    r -= vekt;
+    if (r < 0) return navn;
+  }
+  return 'Dave';
 }
 
 function initTrashTalk() {
@@ -95,14 +145,17 @@ function initTrashTalk() {
     const lines  = TRASH_TALK[driver];
     const line   = lines[Math.floor(Math.random() * lines.length)];
 
-    result.innerHTML = `<span class="trash-driver">${driver}</span><span class="trash-line">"${line}"</span>`;
+    result.innerHTML = `
+      <span class="trash-driver">Radio · ${kode(driver)} · ${driver}</span>
+      <span class="trash-line">«${line}»</span>
+    `;
     result.classList.add('visible');
   });
 }
 
-// Lagoppstillingen hentes fra resultatdataen, så forsiden aldri kommer i
+// Startoppstillingen hentes fra resultatdataen, så forsiden aldri kommer i
 // utakt med tabellene på resultatsiden.
-function initLineup() {
+function initGrid() {
   const container = document.getElementById('lineup');
   if (!container) return;
 
@@ -116,19 +169,35 @@ function initLineup() {
     const label = document.getElementById('lineupSeason');
     if (label) label.textContent = season;
 
-    container.innerHTML = sesong.lag.map(lag => {
-      const forere = (lag.forere || []).map(f => `<span>${f}</span>`).join('');
+    // Filene lagrer poeng per løp, så sesongtotalen er summen av lista.
+    const sum = f => f.poeng.reduce((a, b) => a + b, 0);
+    const startet = sesong.forere.some(f => f.poeng.length > 0);
+    const rekkefolge = startet
+      ? [...sesong.forere].sort((a, b) => sum(b) - sum(a))
+      : sesong.forere;
+
+    container.innerHTML = rekkefolge.map((forer, i) => {
+      const lag   = lagTilForer(sesong, forer.navn);
+      const farge = (lag && lag.farge) || '#78849a';
       return `
-        <div class="team" style="border-left-color:${lag.farge}">
-          <h3 class="team-name" style="color:${lag.farge}">${lag.navn}</h3>
-          <div class="drivers">${forere}</div>
+        <div class="grid-slot" style="--team:${farge}">
+          <span class="slot-pos">${i + 1}</span>
+          <span class="slot-code">${kode(forer.navn)}<span class="slot-name">${forer.navn}</span></span>
+          <span class="slot-team">${lag ? lag.navn : 'Uten lag'}</span>
         </div>
       `;
     }).join('');
+
+    const note = document.getElementById('lineupNote');
+    if (note) {
+      note.textContent = startet
+        ? 'Oppstillingen følger mesterskapsstillingen.'
+        : 'Sesongen har ikke startet. Rekkefølgen er lagoppsettet, ikke stillingen.';
+    }
   });
 }
 
 export function initHomepage() {
   initTrashTalk();
-  initLineup();
+  initGrid();
 }

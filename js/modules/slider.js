@@ -1,5 +1,8 @@
 /**
- * Image slider with fade transition for index.html
+ * Image slider with fade transition for index.html.
+ *
+ * Bildene har ulike format, så hovedbildet vises helt (contain) mens en
+ * uskarp kopi bak fyller resten av feltet. Begge byttes samtidig.
  */
 const images = [
   'img/funnypicai.jpg',
@@ -8,17 +11,22 @@ const images = [
 ];
 
 export function initSlider() {
-  const slideElement = document.getElementById('slide');
-  if (!slideElement) return;
+  const slide    = document.getElementById('slide');
+  const backdrop = document.getElementById('slideBackdrop');
+  if (!slide) return;
 
+  const lag = [slide, backdrop].filter(Boolean);
   let currentIndex = 0;
 
   setInterval(() => {
-    slideElement.style.opacity = '0';
+    lag.forEach(el => { el.style.opacity = '0'; });
+
     setTimeout(() => {
       currentIndex = (currentIndex + 1) % images.length;
-      slideElement.src = images[currentIndex];
-      slideElement.style.opacity = '1';
+      lag.forEach(el => {
+        el.src = images[currentIndex];
+        el.style.opacity = '1';
+      });
     }, 500);
   }, 3500);
 }

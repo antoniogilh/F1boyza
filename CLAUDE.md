@@ -27,17 +27,19 @@ No test suite is configured.
 `js/app.js` is the webpack entry point. It imports all page modules and calls their `init*()` functions on `DOMContentLoaded`. Each module guards against running on the wrong page by checking for required DOM elements, so all modules are safely initialized on every page load.
 
 **All modules:**
-- `js/modules/api.js` — shared `fetchData(url)` wrapper
+- `js/modules/api.js` — shared `fetchData(url)` wrapper. Caches the promise per URL, so several modules can read the same file on one page without refetching
 - `js/modules/navigation.js` — sticky nav + active link highlight
-- `js/modules/countdown.js` — live countdown on `index.html` hero, fetches `data/datoer.json`. Renders individual flip-animated digit elements (`.flip-digit`). Adds `body.race-weekend` class when countdown reaches 0 (triggers pulsing red border site-wide)
+- `js/modules/status.js` — fills the status strip present at the top of every page (`#statusSeason`, `#statusRound`, `#statusFlag`) from `data/datoer.json`. Sets `body.race-weekend` when today is a race day
+- `js/modules/codes.js` — no DOM; maps player and team names to the three-letter codes used in tables, the grid and race control (`Shaya` → `SHA`, `Red Bull` → `RBR`). Unknown names fall back to the first three letters
+- `js/modules/countdown.js` — live countdown on `index.html` hero, fetches `data/datoer.json`. Renders one `.flip-digit` per unit; a digit flashes purple for 140 ms when it changes. Dates are compared at day resolution, so a race today shows the race-weekend state instead of counting down to the next round
 - `js/modules/slider.js` — fade image carousel on `index.html`
-- `js/modules/homepage.js` — index.html-only: trash talk generator (weighted: Dave 50%, Gorba 30%, Frenzy 10%, Antonio 10%). Large pool of lines per player.
-- `js/modules/calendar.js` — race calendar on `kalender.html`, fetches `data/kalender.json`. Shows country flags, race numbers, sprint badges, next-race highlight, staggered fade-in animation
-- `js/modules/dates.js` — race dates table on `kalender.html`, fetches `data/datoer.json`
-- `js/modules/results.js` — Chart.js line charts (straight lines, gradient fill) + standings tables (with player avatars + gap column) + fun stats + dominance meter on `resultater.html`. Fetches both `data/resultater.json` and `data/kalender.json`. Driver rows are clickable (opens modal)
+- `js/modules/homepage.js` — index.html-only: team-radio trash talk generator + the starting grid. The grid orders drivers by championship position, or by file order before the season starts
+- `js/modules/calendar.js` — race calendar on `kalender.html`, fetches `data/kalender.json`. Shows country flags, round numbers (`R01`), sprint badges, run/not-run state, staggered fade-in animation
+- `js/modules/dates.js` — race dates table on `kalender.html`, fetches `data/datoer.json`. Day-resolution comparison, same as the countdown
+- `js/modules/results.js` — Chart.js line charts (straight lines, gradient fill) + timing-tower standings tables (position, code with team colour bar, name, points, gap) + season records + dominance meter on `resultater.html`. Fetches both `data/resultater.json` and `data/kalender.json`. Rows are clickable (opens modal)
 - `js/modules/headtohead.js` — head-to-head comparison chart on `resultater.html`, fetches `data/resultater.json`
 - `js/modules/modal.js` — driver profile modal (injected into DOM). Called by `results.js` on driver row click. Shows points, wins, poles, best/worst round
-- `js/modules/penalties.js` — horizontal bar chart + penalty table on `straff.html`, fetches `data/straff.json`. Worst offender gets a pulsing 🚨 SKAM badge
+- `js/modules/penalties.js` — on `straff.html`, fetches `data/straff.json`. Renders a horizontal bar chart, a per-driver summary table (worst offender gets a pulsing SKAM badge) and a race control message log, newest first
 - `js/modules/wheel.js` — canvas spin wheel on `Spinthatshit.html`, fetches `data/kalender.json`. Fires confetti (`canvas-confetti`) and Web Audio tick sounds on spin. No season selector: it always uses the newest season in the calendar and only offers races with `kjort: false`. Rotation accumulates across spins and the button is disabled while spinning
 - `js/modules/season.js` — no DOM; converts `resultater.json` from per-race points to cumulative and derives team points from driver pairs. Used by `results.js` and `headtohead.js`
 - `js/modules/sound.js` — Web Audio API tick sound generator used by wheel. No audio files required
@@ -79,7 +81,7 @@ Note the array order is the order races were actually driven (chosen by the whee
 { "penaltyPoints": [{ "fører": "Antonio", "poeng": 1, "runde": "R3", "beskrivelse": "..." }] }
 ```
 
-### Player colors (used for avatars in standings)
+### Player colors (fallback when a season has no teams)
 ```js
 Frenzy:  '#990000'  // red        Shaya:   '#e8002d'
 Gorba:   '#22c55e'  // green      Oddi:    '#22c55e'
@@ -87,22 +89,39 @@ Antonio: '#8b5cf6'  // purple     Philip:  '#f97316'
 Dave:    '#eab308'  // yellow     William: '#06b6d4'
 ```
 
-Chart lines are coloured by **team** where the season defines teams (`lag[].farge`), with the second driver in each pair drawn dashed. Seasons without team membership fall back to the generic `COLORS` palette.
-Defined as `PLAYER_COLORS` in `results.js`.
+`fargeFor()` in `results.js` resolves a colour in this order: the driver's team colour (`lag[].farge`), then `PLAYER_COLORS`, then the generic `COLORS` palette. It drives both the chart lines and the team colour bar in the standings; the second driver in each team pair is drawn dashed so the pair can be told apart.
 
 ### Styling
-Single CSS file at `css/style.css`. CSS variables: `--red: #990000`, `--dark`, `--gray`, `--light`, `--gold`, `--silver`, `--bronze`. Uses **Barlow Condensed** (Google Fonts) throughout.
+Single CSS file at `css/style.css`. The whole site is styled as a **live timing screen**: dark blue-black monitor, monospace numerals, and a colour language where every colour carries one meaning.
+
+```
+--screen #05070d   --panel #0c111b   --raised #131b28   --rule #1d2532
+--text   #e9eff8   --dim   #8792a6   --dimmer #6f7d94
+--purple #b026ff   raskest / leder / aktiv   (--purple-ink #cb7bff for tekst)
+--green  #00d47f   kjørt / fullført
+--yellow #ffd320   neste / varsel
+--red-hot #ff2d1a  straff / rødt flagg
+```
+
+Everything not carrying one of those four meanings is greyscale. Both grey tones are contrast-checked against `--panel` (6.0:1 and 4.5:1); the accents are only used as text via `--purple-ink`, since the raw accents fall below 4.5:1 at label sizes. Team colours appear as a 3px bar, never as small text — Ferrari red and Red Bull blue both fail contrast at 9px.
+
+Three type roles, all variable-width Google Fonts:
+- `--display` **Anybody** (expanded, 800–900) — wordmark and page titles only
+- `--data` **Martian Mono** — every number, code, label and status word
+- `--body` **Archivo** — sentences
 
 ### Key CSS classes
-- `.race.done` / `.race.not-done` / `.race.next-up` — calendar row states
-- `.pos-1/2/3` — gold/silver/bronze on standings rows
-- `.leader-badge` — red "Leader" chip
-- `.shame-badge` — pulsing red "Skam" chip on worst penalty offender
-- `body.race-weekend` — triggers pulsing red border via `::before` pseudo-element
+- `.statusbar` + `.status-flag` (`.caution` / `.idle`) — the broadcast status strip on every page
+- `.panel` / `.panel-head` / `.panel-body` — the standard content block; `.span-2` makes it full width in the two-column grid
+- `.grid-slots` / `.grid-slot` — the signature starting grid on the front page; even slots are offset with `margin-top` to stagger like a real grid. `--team` on the slot sets the colour bar
+- `.race.done` / `.race.not-done` — calendar row states
+- `.standings-table` — the timing tower. **Cell rules must be written as `.standings-table .pos-cell`**, since a bare `.pos-cell` loses to `.standings-table td` on specificity
+- `.pos-1` — purple position number on the leader's row
+- `.leader-badge` / `.shame-badge` — outlined chips in purple and red
+- `.rc-msg` — a race control message on `straff.html`
+- `.flip-digit.flip` — a countdown digit lighting up for 140 ms as it changes
+- `body.race-weekend` — turns the status strip yellow
 - `.modal-overlay.open` — driver stats modal visible state
-- `.flip-digit` / `.flip-digit.flip` — countdown digit elements with flip animation
-- `.player-avatar` — colored circle with player initial in standings rows
-- `.gap-cell` — points gap to leader column in standings tables
 
 ### Build
 Webpack merges `webpack.common.js` with env-specific configs:

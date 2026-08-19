@@ -2,8 +2,9 @@ import { fetchData } from './api.js';
 import Chart from 'chart.js/auto';
 import { showDriverModal } from './modal.js';
 import { normaliserSesonger, lagTilForer, total } from './season.js';
+import { kode } from './codes.js';
 
-const COLORS = ['#990000', '#FFD700', '#00b4d8', '#ff6b35', '#7fff7f', '#ff69b4', '#b388ff', '#80deea'];
+const COLORS = ['#b026ff', '#00d47f', '#ffd320', '#ff6b35', '#06b6d4', '#ff69b4', '#8b5cf6', '#80deea'];
 
 const PLAYER_COLORS = {
   Frenzy:  '#990000',
@@ -16,24 +17,26 @@ const PLAYER_COLORS = {
   William: '#06b6d4',
 };
 
+const CHART_FONT = { family: 'Martian Mono, ui-monospace, monospace', size: 10 };
+
 const CHART_OPTIONS = {
   responsive: true,
   plugins: {
     legend: {
       labels: {
-        color: '#ccc',
-        font: { family: 'Barlow Condensed, Segoe UI, Arial', size: 14, weight: 'bold' },
+        color: '#e9eff8',
+        font: { ...CHART_FONT, size: 11, weight: '600' },
+        boxWidth: 10,
+        boxHeight: 10,
         padding: 16,
       }
     }
   },
   scales: {
-    x: { ticks: { color: '#777' }, grid: { color: 'rgba(255,255,255,0.04)' } },
-    y: { ticks: { color: '#777' }, grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true }
+    x: { ticks: { color: '#47536a', font: CHART_FONT }, grid: { color: 'rgba(255,255,255,0.04)' } },
+    y: { ticks: { color: '#47536a', font: CHART_FONT }, grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true }
   }
 };
-
-const MEDALS = ['🥇', '🥈', '🥉'];
 
 const DOM_PHRASES = [
   (leader, last, gap) => `${leader} og ${last} er skilt med ${gap} poeng. ${last} nekter å gi opp.`,
@@ -61,33 +64,36 @@ function toPerRound(cumulative) {
   return cumulative.map((val, i) => i === 0 ? val : val - cumulative[i - 1]);
 }
 
-function playerAvatar(name) {
-  const color = PLAYER_COLORS[name];
-  if (!color) return '';
-  return `<span class="player-avatar" style="background:${color}">${name[0].toUpperCase()}</span>`;
+/** Lagfarge først, ellers spillerens egen farge, ellers paletten. */
+function fargeFor(data, navn, idx) {
+  const lag = lagTilForer(data, navn);
+  if (lag && lag.farge) return lag.farge;
+  return PLAYER_COLORS[navn] || COLORS[idx % COLORS.length];
 }
 
-function buildTable(tableEl, entries, allDrivers, kalenderData, rounds) {
+function buildTable(tableEl, entries, allDrivers, kalenderData, rounds, farge) {
   const sorted = [...entries].sort((a, b) => total(b.poeng) - total(a.poeng));
   const leaderTotal = total(sorted[0].poeng);
-  // Før første løp står alle likt — da gir medaljer og «Leader» ingen mening.
+  // Før første løp står alle likt — da sier posisjon og gap ingenting.
   const sesongStartet = leaderTotal > 0;
 
   let html = '';
   sorted.forEach((entry, idx) => {
     const sum      = total(entry.poeng);
-    const gap      = idx === 0 || !sesongStartet ? '—' : `-${leaderTotal - sum}p`;
-    const posClass = sesongStartet && idx < 3 ? `pos-${idx + 1}` : '';
-    const posIcon  = sesongStartet && idx < 3 ? MEDALS[idx] : `${idx + 1}`;
-    const badge    = sesongStartet && idx === 0 ? `<span class="leader-badge">Leader</span>` : '';
-    const avatar   = playerAvatar(entry.navn);
+    const bak      = leaderTotal - sum;
+    const posClass = sesongStartet && idx === 0 ? 'pos-1' : '';
+    const badge    = sesongStartet && idx === 0 ? `<span class="leader-badge">Leder</span>` : '';
+    const gap      = idx === 0 || !sesongStartet
+      ? '<td class="gap-cell">—</td>'
+      : `<td class="gap-cell" title="${bak} poeng bak lederen">+${bak}</td>`;
 
     html += `
-      <tr class="${posClass}" data-driver="${entry.navn}" style="cursor:pointer" title="Klikk for stats">
-        <td class="pos-cell">${posIcon}</td>
-        <td class="name-cell">${avatar}${entry.navn}${badge}</td>
+      <tr class="clickable-row ${posClass}" data-driver="${entry.navn}" title="Åpne førerkort">
+        <td class="pos-cell">${idx + 1}</td>
+        <td class="code-cell"><span class="team-bar" style="--team:${farge(entry, idx)}"></span>${kode(entry.navn)}</td>
+        <td class="name-cell">${entry.navn}${badge}</td>
         <td class="points-cell">${sum}</td>
-        <td class="gap-cell">${gap}</td>
+        ${gap}
       </tr>
     `;
   });
@@ -150,20 +156,19 @@ function renderStats(stats) {
   const el = document.getElementById('statsBlock');
   if (!el) return;
 
-  const stat = (icon, label, value) => `
+  const stat = (label, value) => `
     <div class="stat-item">
-      <span class="stat-icon">${icon}</span>
       <span class="stat-label">${label}</span>
       <span class="stat-value">${value || '—'}</span>
     </div>
   `;
 
   el.innerHTML =
-    stat('🏆', 'Mest seire',       stats.topWinner ? `${stats.topWinner[0]} (${stats.topWinner[1]})` : null) +
-    stat('⚡', 'Mest poles',       stats.topPole   ? `${stats.topPole[0]} (${stats.topPole[1]})`     : null) +
-    stat('💨', 'Mest sprintseire', stats.topSprint ? `${stats.topSprint[0]} (${stats.topSprint[1]})` : null) +
-    stat('🔥', 'Lengste streak',   stats.bestStreak.driver ? `${stats.bestStreak.driver} (${stats.bestStreak.count})` : null) +
-    stat('💰', 'Beste runde',      stats.bigHaul.driver ? `${stats.bigHaul.driver} +${stats.bigHaul.points}p (${stats.bigHaul.round})` : null);
+    stat('Flest seire',       stats.topWinner ? `${stats.topWinner[0]} · ${stats.topWinner[1]}` : null) +
+    stat('Flest poles',       stats.topPole   ? `${stats.topPole[0]} · ${stats.topPole[1]}`     : null) +
+    stat('Flest sprintseire', stats.topSprint ? `${stats.topSprint[0]} · ${stats.topSprint[1]}` : null) +
+    stat('Lengste seiersrekke', stats.bestStreak.driver ? `${stats.bestStreak.driver} · ${stats.bestStreak.count}` : null) +
+    stat('Største runde',     stats.bigHaul.driver ? `${stats.bigHaul.driver} · +${stats.bigHaul.points}p ${stats.bigHaul.round}` : null);
 }
 
 function renderDominance(forere) {
@@ -258,7 +263,7 @@ export function initResults() {
           datasets: data.forere.map((f, i) => {
             // Førere arver lagfargen; makkeren får stiplet linje så de kan skilles.
             const lag   = lagTilForer(data, f.navn);
-            const color = (lag && lag.farge) || COLORS[i % COLORS.length];
+            const color = fargeFor(data, f.navn, i);
             const erMakker = lag ? (lag.forere || []).indexOf(f.navn) > 0 : false;
             return {
               label: f.navn, data: [...f.poeng], tension: 0,
@@ -273,7 +278,11 @@ export function initResults() {
         options: CHART_OPTIONS,
       });
 
-      buildTable(document.getElementById('driverTable'), data.forere, data.forere, kalenderData || {}, data.runder);
+      buildTable(
+        document.getElementById('driverTable'), data.forere, data.forere,
+        kalenderData || {}, data.runder,
+        (entry, i) => fargeFor(data, entry.navn, i),
+      );
 
       teamChart = new Chart(teamChartEl, {
         type: 'line',
@@ -293,7 +302,11 @@ export function initResults() {
         options: CHART_OPTIONS,
       });
 
-      buildTable(document.getElementById('teamTable'), data.lag, data.lag, kalenderData || {}, data.runder);
+      buildTable(
+        document.getElementById('teamTable'), data.lag, data.lag,
+        kalenderData || {}, data.runder,
+        (entry, i) => entry.farge || COLORS[i % COLORS.length],
+      );
 
       if (toggleBtn) {
         toggleBtn.onclick = () => {

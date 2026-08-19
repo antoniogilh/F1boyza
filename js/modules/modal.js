@@ -1,4 +1,5 @@
 import { total } from './season.js';
+import { kode } from './codes.js';
 
 let modalEl = null;
 
@@ -52,20 +53,21 @@ export function showDriverModal(driver, allDrivers, kalenderData, rounds) {
     if (i === 0 || delta < worstRound.points) worstRound = { points: delta, round: rounds[i] || `R${i + 1}` };
   });
 
-  const medals     = ['🥇', '🥈', '🥉'];
-  const posDisplay = pos <= 3 ? medals[pos - 1] : `P${pos}`;
   const driverWins  = wins[driver.navn]  || 0;
   const driverPoles = poles[driver.navn] || 0;
 
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-driver-header">
-      <span class="modal-pos">${posDisplay}</span>
-      <h2 class="modal-driver-name">${driver.navn}</h2>
+      <span class="modal-pos">P${pos}</span>
+      <div>
+        <span class="eyebrow">${kode(driver.navn)}</span>
+        <h2 class="modal-driver-name">${driver.navn}</h2>
+      </div>
     </div>
     <div class="modal-stats-grid">
       <div class="modal-stat">
         <span class="modal-stat-val">${totalSum}</span>
-        <span class="modal-stat-label">Totalt</span>
+        <span class="modal-stat-label">Poeng totalt</span>
       </div>
       <div class="modal-stat">
         <span class="modal-stat-val">${driverWins}</span>

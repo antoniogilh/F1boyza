@@ -8,16 +8,17 @@
   <title>F1 BOYZA – Kalender</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@100..150,700..900&family=Archivo:wght@400;500;600&family=Martian+Mono:wdth,wght@87.5..112.5,300..700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<header class="hero small">
-  <div class="overlay">
-    <h1>Sesongkalender</h1>
-    <p>Avlyst? Aldri. Forsinket? Alltid.</p>
+<div class="statusbar">
+  <div class="status-session">
+    <span>Sesong <b id="statusSeason">—</b></span>
+    <span>Runde <b id="statusRound">—</b></span>
   </div>
-</header>
+  <span class="status-flag idle" id="statusFlag">Laster</span>
+</div>
 
 <nav class="topnav">
   <div class="menu-toggle">☰</div>
@@ -30,10 +31,16 @@
   </div>
 </nav>
 
+<header class="page-head">
+  <span class="eyebrow">Sesongkalender</span>
+  <h1>Løpene</h1>
+  <p>Banene trekkes på hjulet, så rekkefølgen er ikke kalenderrekkefølge. Datoene under er når vi faktisk kjører.</p>
+</header>
+
 <main class="container single">
-  <section class="card">
-    <div class="card-header">
-      <h2>Løp</h2>
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Baner</h2>
       <select id="season" class="season-select">
         <option value="2025">2025</option>
         <option value="2026" selected>2026</option>
@@ -42,8 +49,11 @@
     <div id="calendar"></div>
   </section>
 
-  <section class="card">
-    <h2>Løpsdatoer</h2>
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Kjøreplan</h2>
+      <span class="panel-meta">Datoer</span>
+    </div>
     <div id="datesTable"></div>
   </section>
 

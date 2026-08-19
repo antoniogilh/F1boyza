@@ -2,6 +2,7 @@
  * F1 BOYZA - Main Application Entry Point
  */
 import { initNavigation }  from './modules/navigation.js';
+import { initStatusBar }   from './modules/status.js';
 import { initSlider }      from './modules/slider.js';
 import { initCountdown }   from './modules/countdown.js';
 import { initHomepage }    from './modules/homepage.js';
@@ -16,6 +17,7 @@ import '../css/style.css';
 
 document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
+  initStatusBar();
   initCountdown();
   initSlider();
   initHomepage();

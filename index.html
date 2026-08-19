@@ -7,17 +7,18 @@
   <link rel="icon" type="image/png" href="fanelogo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@100..150,700..900&family=Archivo:wght@400;500;600&family=Martian+Mono:wdth,wght@87.5..112.5,300..700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<header class="hero">
-  <div class="overlay">
-    <h1>F1 BOYZA</h1>
-    <p>Full gass. Null ansvar.</p>
-    <div id="countdown" class="hero-countdown"></div>
+<div class="statusbar">
+  <div class="status-session">
+    <span>Sesong <b id="statusSeason">—</b></span>
+    <span>Runde <b id="statusRound">—</b></span>
   </div>
-</header>
+  <span class="status-flag idle" id="statusFlag">Laster</span>
+</div>
+
 <nav class="topnav">
   <div class="menu-toggle">☰</div>
   <div class="nav-links" id="navLinks">
@@ -29,43 +30,72 @@
   </div>
 </nav>
 
+<header class="hero">
+  <div class="overlay">
+    <span class="eyebrow">Fantasyliga · seks førere · null nåde</span>
+    <h1>F1 Boyza</h1>
+    <p>Full gass. Null ansvar.</p>
+    <div id="countdown" class="hero-countdown"></div>
+  </div>
+</header>
+
 <main class="container">
 
-  <section class="card">
-    <h2>Funny moments</h2>
-    <div class="slider">
-      <img id="slide" src="img/funnypicai.jpg" alt="funny moment" />
+  <section class="panel span-2">
+    <div class="panel-head">
+      <h2>Grid</h2>
+      <span class="panel-meta">Oppstilling <span id="lineupSeason"></span></span>
+    </div>
+    <div class="grid-strip"></div>
+    <div id="lineup" class="grid-slots"></div>
+    <p class="grid-note" id="lineupNote"></p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Team radio</h2>
+      <span class="panel-meta">Kanal 1</span>
+    </div>
+    <div class="panel-body">
+      <button id="trashTalkBtn" class="trash-talk-btn">Åpne sambandet</button>
+      <div id="trashTalkResult" class="trash-talk-result"></div>
     </div>
   </section>
 
-  <section class="card">
-    <h2>🏁 Lag <span id="lineupSeason"></span></h2>
-    <div id="lineup" class="lineup"></div>
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Tittelholdere</h2>
+      <span class="panel-meta">Sesong 1</span>
+    </div>
+    <div class="panel-body">
+      <ul class="winners">
+        <li>
+          <span class="trophy">CON</span>
+          <span class="winner-label">Konstruktørmester 2025</span>
+          <strong>Ferrari</strong>
+        </li>
+        <li>
+          <span class="trophy">DRV</span>
+          <span class="winner-label">Førermester 2025</span>
+          <strong>Shaya</strong>
+        </li>
+      </ul>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>🏆 Hall of Fame</h2>
-    <ul class="winners">
-      <li>
-        <span class="trophy">🏗️</span>
-        <span class="winner-label">Sesong 1 – Constructor</span>
-        <strong>Ferrari</strong>
-      </li>
-      <li>
-        <span class="trophy">🏎️</span>
-        <span class="winner-label">Sesong 1 – Driver</span>
-        <strong>Shaya</strong>
-      </li>
-    </ul>
-  </section>
-
-  <section class="card">
-    <h2>🎤 Hvem er verstingen?</h2>
-    <button id="trashTalkBtn" class="trash-talk-btn">Velg syndebukk</button>
-    <div id="trashTalkResult" class="trash-talk-result"></div>
+  <section class="panel span-2">
+    <div class="panel-head">
+      <h2>Onboard</h2>
+      <span class="panel-meta">Kam 4</span>
+    </div>
+    <div class="slider">
+      <img class="slide-backdrop" id="slideBackdrop" src="img/funnypicai.jpg" alt="" aria-hidden="true" />
+      <img class="slide-main" id="slide" src="img/funnypicai.jpg" alt="Øyeblikk fra ligaen" />
+    </div>
   </section>
 
 </main>
+
 <footer>© F1 BOYZA · FRNZY on Spotify</footer>
 
 <script src="js/app.js"></script>

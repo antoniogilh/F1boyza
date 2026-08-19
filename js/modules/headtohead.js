@@ -2,6 +2,8 @@ import { fetchData } from './api.js';
 import Chart from 'chart.js/auto';
 import { normaliserSesonger, total } from './season.js';
 
+const CHART_FONT = { family: 'Martian Mono, ui-monospace, monospace', size: 10 };
+
 export function initHeadToHead() {
   const sel1    = document.getElementById('h2hDriver1');
   const sel2    = document.getElementById('h2hDriver2');
@@ -59,21 +61,22 @@ export function initHeadToHead() {
             {
               label: d1.navn,
               data: d1.poeng,
-              borderColor: '#990000',
+              borderColor: '#b026ff',
               backgroundColor: 'transparent',
-              borderWidth: 3,
-              tension: 0.35,
-              pointRadius: 4,
+              borderWidth: 2,
+              tension: 0,
+              pointRadius: 3,
               pointHoverRadius: 6,
             },
             {
               label: d2.navn,
               data: d2.poeng,
-              borderColor: '#FFD700',
+              borderColor: '#00d47f',
               backgroundColor: 'transparent',
-              borderWidth: 3,
-              tension: 0.35,
-              pointRadius: 4,
+              borderWidth: 2,
+              borderDash: [6, 4],
+              tension: 0,
+              pointRadius: 3,
               pointHoverRadius: 6,
             }
           ]
@@ -83,14 +86,16 @@ export function initHeadToHead() {
           plugins: {
             legend: {
               labels: {
-                color: '#ccc',
-                font: { family: 'Barlow Condensed, sans-serif', size: 14, weight: 'bold' },
+                color: '#e9eff8',
+                font: { ...CHART_FONT, size: 11, weight: '600' },
+                boxWidth: 10,
+                boxHeight: 10,
               }
             }
           },
           scales: {
-            x: { ticks: { color: '#777' }, grid: { color: 'rgba(255,255,255,0.04)' } },
-            y: { ticks: { color: '#777' }, grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true }
+            x: { ticks: { color: '#47536a', font: CHART_FONT }, grid: { color: 'rgba(255,255,255,0.04)' } },
+            y: { ticks: { color: '#47536a', font: CHART_FONT }, grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true }
           }
         }
       });

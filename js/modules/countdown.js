@@ -1,5 +1,17 @@
 import { fetchData } from './api.js';
 
+function startenAvDagen(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function lopshelg(el, runde) {
+  document.body.classList.add('race-weekend');
+  el.innerHTML = `
+    <span class="countdown-label">Løpshelg · ${runde}</span>
+    <span class="countdown-timer">Spin hjulet</span>
+  `;
+}
+
 export function initCountdown() {
   const el = document.getElementById('countdown');
   if (!el) return;
@@ -7,18 +19,27 @@ export function initCountdown() {
   fetchData('data/datoer.json').then(data => {
     if (!data) return;
 
-    const now = new Date();
-    let nextDate = null;
+    // Datoene er dager, ikke klokkeslett. Et løp «i dag» er ikke passert.
+    const now  = new Date();
+    const idag = startenAvDagen(now);
+    let neste  = null;
 
     Object.keys(data).sort().forEach(season => {
       data[season].forEach(entry => {
+        if (!entry.dato) return; // dato ikke satt ennå
         const d = new Date(entry.dato);
-        if (d > now && (!nextDate || d < nextDate)) nextDate = d;
+        if (startenAvDagen(d) < idag) return;
+        if (!neste || d < neste.dato) neste = { dato: d, runde: entry.runde };
       });
     });
 
-    if (!nextDate) {
-      el.innerHTML = `<span class="countdown-label">Ingen kommende løp registrert</span>`;
+    if (!neste) {
+      el.innerHTML = `<span class="countdown-label">Ingen kommende løp satt opp</span>`;
+      return;
+    }
+
+    if (startenAvDagen(neste.dato).getTime() === idag.getTime()) {
+      lopshelg(el, neste.runde);
       return;
     }
 
@@ -26,23 +47,20 @@ export function initCountdown() {
 
     function buildDOM() {
       el.innerHTML = `
-        <span class="countdown-label">Neste løp om</span>
+        <span class="countdown-label">Neste løp · ${neste.runde}</span>
         <span class="countdown-units">
           <span class="flip-unit">
             <span class="flip-digit" id="cd-d">0</span>
-            <span class="flip-label">dager</span>
+            <span class="flip-label">dag</span>
           </span>
-          <span class="flip-sep">:</span>
           <span class="flip-unit">
             <span class="flip-digit" id="cd-h">00</span>
-            <span class="flip-label">timer</span>
+            <span class="flip-label">tim</span>
           </span>
-          <span class="flip-sep">:</span>
           <span class="flip-unit">
             <span class="flip-digit" id="cd-m">00</span>
             <span class="flip-label">min</span>
           </span>
-          <span class="flip-sep">:</span>
           <span class="flip-unit">
             <span class="flip-digit" id="cd-s">00</span>
             <span class="flip-label">sek</span>
@@ -57,24 +75,22 @@ export function initCountdown() {
       };
     }
 
+    // Feltet lyser opp i det verdien låses, som et timing-felt som oppdateres.
     function setDigit(digitEl, val) {
       if (digitEl.textContent === val) return;
       digitEl.textContent = val;
-      digitEl.classList.remove('flip');
-      void digitEl.offsetWidth; // force reflow to restart animation
       digitEl.classList.add('flip');
+      clearTimeout(digitEl.dataset.timer);
+      digitEl.dataset.timer = setTimeout(() => digitEl.classList.remove('flip'), 140);
     }
 
     function tick() {
-      const diff = nextDate - new Date();
+      const diff = neste.dato - new Date();
 
       if (diff <= 0) {
-        document.body.classList.add('race-weekend');
-        el.innerHTML = `<span class="countdown-label">Det er løpshelg!</span><span class="countdown-timer">🏁 SPIN THE WHEEL!</span>`;
+        lopshelg(el, neste.runde);
         return;
       }
-
-      document.body.classList.remove('race-weekend');
 
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);

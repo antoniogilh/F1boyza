@@ -9,10 +9,9 @@ let ctx = null;
 let rotasjon = 0;   // hjulets nåværende vinkel, så neste spinn fortsetter derfra
 let spinner = false;
 
-const COLORS = [
-  '#c0392b', '#1a6b3a', '#1565c0', '#7b1fa2',
-  '#e65100', '#00695c', '#827717', '#ad1457',
-];
+// Fire mørke toner fra sidepaletten – hjulet skal se ut som en skjerm,
+// ikke som et lykkehjul. Teksten er hvit på alle.
+const COLORS = ['#141c2b', '#1d1230', '#0e2a20', '#2b1116'];
 
 export function initWheel() {
   wheelCanvas = document.getElementById('wheel');
@@ -42,7 +41,7 @@ export function initWheel() {
     if (spinner) return;
 
     if (segments.length === 0) {
-      if (resultDiv) resultDiv.textContent = 'Ingen ubegynte baner igjen!';
+      if (resultDiv) resultDiv.textContent = 'Alle banene er kjørt';
       return;
     }
 
@@ -84,7 +83,7 @@ export function initWheel() {
         const index = Math.floor((segments.length - (adjustedAngle / segAngle)) % segments.length);
         const winner = segments[index];
 
-        if (resultDiv) resultDiv.textContent = `🏁 ${winner}`;
+        if (resultDiv) resultDiv.textContent = `Neste løp · ${winner}`;
 
         spinner = false;
         spinBtn.disabled = false;
@@ -93,7 +92,7 @@ export function initWheel() {
           particleCount: 120,
           spread: 80,
           origin: { y: 0.55 },
-          colors: ['#990000', '#ffffff', '#FFD700', '#aaaaaa'],
+          colors: ['#b026ff', '#ffffff', '#00d47f', '#ffd320'],
         });
       }
     }
@@ -119,15 +118,15 @@ function drawWheel() {
   ctx.clearRect(0, 0, w, h);
 
   if (num === 0) {
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = '#0c111b';
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, 2 * Math.PI);
     ctx.fill();
-    ctx.fillStyle = '#666';
-    ctx.font = 'bold 18px Barlow Condensed, Arial';
+    ctx.fillStyle = '#78849a';
+    ctx.font = '600 15px Archivo, Segoe UI, Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Ingen løp igjen', cx, cy);
+    ctx.fillText('Alle banene er kjørt', cx, cy);
     return;
   }
 
@@ -144,8 +143,8 @@ function drawWheel() {
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(cx + r * Math.cos(i * anglePer), cy + r * Math.sin(i * anglePer));
-    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
     ctx.stroke();
 
     ctx.save();
@@ -153,19 +152,19 @@ function drawWheel() {
     ctx.rotate((i + 0.5) * anglePer);
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#fff';
-    ctx.font = `bold ${fontSize}px Barlow Condensed, Arial`;
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.fillStyle = '#e9eff8';
+    ctx.font = `600 ${fontSize}px Archivo, Segoe UI, Arial`;
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
     ctx.shadowBlur = 4;
-    ctx.fillText(segments[i], r - 12, 0);
+    ctx.fillText(segments[i], r - 14, 0);
     ctx.restore();
   }
 
   ctx.beginPath();
-  ctx.arc(cx, cy, 22, 0, 2 * Math.PI);
-  ctx.fillStyle = '#0b0b0b';
+  ctx.arc(cx, cy, 24, 0, 2 * Math.PI);
+  ctx.fillStyle = '#05070d';
   ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#b026ff';
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 }
