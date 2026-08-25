@@ -81,6 +81,8 @@ Note the array order is the order races were actually driven (chosen by the whee
 { "penaltyPoints": [{ "fører": "Antonio", "poeng": 1, "runde": "R3", "beskrivelse": "..." }] }
 ```
 
+**Deliberately not keyed by season.** Like real F1 penalty points, these run on a rolling window: a penalty given in R*n* expires when R*n* comes around again the following season. So the file holds only the currently active penalties across the season boundary, and expired entries are deleted by hand as the rounds roll past. `runde` is therefore never season-qualified, and each round number can only be present once at a time.
+
 ### Player colors (fallback when a season has no teams)
 ```js
 Frenzy:  '#990000'  // red        Shaya:   '#e8002d'
