@@ -27,7 +27,7 @@
   ],
   "2026": [
     { "navn": "Bahrain",     "podium": "", "kjort": false },
-    { "navn": "Saudi Arabia","podium": "", "kjort": false },
+    { "navn": "Saudi Arabia","podium": "Pole: Shaya, Racevinner: Gorba", "kjort": true },
     { "navn": "Australia",   "podium": "", "kjort": false },
     { "navn": "Japan",       "podium": "", "kjort": false },
     { "navn": "China",       "podium": "", "kjort": false },

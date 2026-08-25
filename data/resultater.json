@@ -55,32 +55,32 @@
       {
         "navn": "Shaya",
         "lag": "Ferrari",
-        "poeng": []
+        "poeng": [18]
       },
       {
         "navn": "Philip",
         "lag": "Ferrari",
-        "poeng": []
+        "poeng": [0]
       },
       {
         "navn": "Antonio",
         "lag": "Red Bull",
-        "poeng": []
+        "poeng": [12]
       },
       {
         "navn": "Gorba",
         "lag": "Red Bull",
-        "poeng": []
+        "poeng": [25]
       },
       {
         "navn": "Dave",
         "lag": "Mercedes",
-        "poeng": []
+        "poeng": [10]
       },
       {
         "navn": "William",
         "lag": "Mercedes",
-        "poeng": []
+        "poeng": [15]
       }
     ]
   }
