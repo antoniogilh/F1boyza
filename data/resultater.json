@@ -43,7 +43,7 @@
       {
         "navn": "Red Bull",
         "farge": "#3671c6",
-        "forere": ["Antonio", "Gorba"]
+        "forere": ["Antonio", "Oddi"]
       },
       {
         "navn": "Mercedes",
@@ -68,7 +68,7 @@
         "poeng": [12]
       },
       {
-        "navn": "Gorba",
+        "navn": "Oddi",
         "lag": "Red Bull",
         "poeng": [25]
       },

@@ -1,5 +1,6 @@
 import { total } from './season.js';
 import { kode } from './codes.js';
+import { parsePodium } from './podium.js';
 
 let modalEl = null;
 
@@ -34,10 +35,10 @@ export function showDriverModal(driver, allDrivers, kalenderData, rounds) {
   Object.values(kalenderData).forEach(season => {
     season.forEach(race => {
       if (!race.kjort || !race.podium) return;
-      const w = race.podium.match(/Racevinner:\s*([\w]+)/i);
-      const p = race.podium.match(/Pole:\s*([\w]+)/i);
-      if (w) wins[w[1]] = (wins[w[1]] || 0) + 1;
-      if (p) poles[p[1]] = (poles[p[1]] || 0) + 1;
+      const { pole, sprintpole, vinner } = parsePodium(race.podium);
+      if (vinner)     wins[vinner]      = (wins[vinner]     || 0) + 1;
+      if (pole)       poles[pole]       = (poles[pole]       || 0) + 1;
+      if (sprintpole) poles[sprintpole] = (poles[sprintpole] || 0) + 1;
     });
   });
 

@@ -7,12 +7,9 @@ const KODER = {
   Shaya:   'SHA',
   Philip:  'PHI',
   Antonio: 'ANT',
-  Gorba:   'GOR',
   Oddi:    'ODD',
   Dave:    'DAV',
   William: 'WIL',
-  Frenzy:  'FRZ',
-  Cabra:   'CBR',
 
   Ferrari:    'FER',
   McLaren:    'MCL',

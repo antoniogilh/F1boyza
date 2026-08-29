@@ -6,11 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 F1 BOYZA is a Norwegian-language static website for tracking an F1 fantasy league among friends. It displays race calendars, driver/team standings with charts, penalty points, a "spin the wheel" feature for selecting the next race, and various fun/stats features.
 
-**Players:** Shaya, Philip, Antonio, Gorba, Dave, William
+**Players:** Shaya, Philip, Antonio, Oddi, Dave, William
 
-Some players appear under more than one name in older data: **Gorba = Oddi**, and podium text in `kalender.json` 2025 uses the nicknames Frenzy and Cabra. `resultater.json` 2025 uses `Oddi`; 2026 onwards uses `Gorba`. This mismatch means win/pole lookups (modal, fun stats) only match players whose podium name equals their `resultater.json` name.
+Names are now normalised everywhere — one name per player in every data file. The old aliases (Frenzy = Shaya, Cabra = Antonio, Gorba = Oddi) have been rewritten out of `kalender.json`, `resultater.json` and `straff.json`; **don't reintroduce them**, since win/pole/slam-dunk lookups match podium text against the `resultater.json` name.
 
-**2026 teams:** Ferrari (Shaya, Philip) · Red Bull (Antonio, Gorba) · Mercedes (Dave, William)
+**2026 teams:** Ferrari (Shaya, Philip) · Red Bull (Antonio, Oddi) · Mercedes (Dave, William)
 
 ## Commands
 
@@ -36,7 +36,8 @@ No test suite is configured.
 - `js/modules/homepage.js` — index.html-only: team-radio trash talk generator + the starting grid. The grid orders drivers by championship position, or by file order before the season starts
 - `js/modules/calendar.js` — race calendar on `kalender.html`, fetches `data/kalender.json`. Shows country flags, round numbers (`R01`), sprint badges, run/not-run state, staggered fade-in animation
 - `js/modules/dates.js` — race dates table on `kalender.html`, fetches `data/datoer.json`. Day-resolution comparison, same as the countdown. Rounds with `dato: null` are collapsed into a single trailing summary row (`R2–R24 · Dato ikke satt`), so an unplanned season is two rows instead of twenty-four identical ones. The range label is only used when the undated rounds are actually contiguous
-- `js/modules/results.js` — Chart.js line charts (straight lines, gradient fill) + timing-tower standings tables (position, code with team colour bar, name, points, gap) + season records + dominance meter on `resultater.html`. Fetches both `data/resultater.json` and `data/kalender.json`. Rows are clickable (opens modal)
+- `js/modules/podium.js` — no DOM; parses the free-text `podium` field in `kalender.json` into `{ pole, sprintpole, vinner, sprint, slamDunk }`. Handles `Pole: X, Racevinner: Y` (plus optional `Sprintpole:` / `Sprintvinner:` on sprint weekends) and the shorthand `X Slam Dunk`, which counts as a pole *and* a win for that player. **`sprintpole` counts as a pole** in the records and the driver modal, so a sprint weekend can yield two poles. **`slamDunk` is only true for races literally written as `X Slam Dunk`** — pole and win to the same player in the normal form is not derived as one; slam dunks are noted by hand. Used by `results.js` and `modal.js` — any new win/pole counting must go through it
+- `js/modules/results.js` — Chart.js line charts (straight lines, gradient fill) + timing-tower standings tables (position, code with team colour bar, name, points, gap) + season records (most wins, poles, sprint wins, longest win streak, most slam dunks) + dominance meter on `resultater.html`. Fetches both `data/resultater.json` and `data/kalender.json`. Rows are clickable (opens modal)
 - `js/modules/headtohead.js` — head-to-head comparison chart on `resultater.html`, fetches `data/resultater.json`
 - `js/modules/modal.js` — driver profile modal (injected into DOM). Called by `results.js` on driver row click. Shows points, wins, poles, best/worst round
 - `js/modules/penalties.js` — on `straff.html`, fetches `data/straff.json`. Renders a horizontal bar chart, a per-driver summary table (worst offender gets a pulsing SKAM badge) and a race control message log, newest first
@@ -51,7 +52,7 @@ JSON files fetched client-side at runtime.
 ```json
 { "navn": "Bahrain", "podium": "Pole: X, Racevinner: Y", "kjort": true }
 ```
-`kjort: true` = completed. `podium` is free-text. Sprint weekends have `[Sprint]` in `navn`. **No dates here** — dates are in `datoer.json` (deliberately separate so the wheel track selection stays secret).
+`kjort: true` = completed. `podium` is free-text, parsed by `podium.js`. Recognised fields, in any order: `Sprintpole:`, `Sprintvinner:`, `Pole:`, `Racevinner:` — or the shorthand `X Slam Dunk` when the same player took both pole and win. Sprint weekends have `[Sprint]` in `navn` and carry all four fields; a sprint weekend therefore awards two poles (`Sprintpole` + `Pole`). Sprint-pole data for 2025 was reconstructed by hand and follows the sprint winner. **No dates here** — dates are in `datoer.json` (deliberately separate so the wheel track selection stays secret).
 
 **`data/datoer.json`** — race dates only, keyed by season. Used by countdown. Update this when the real calendar is confirmed:
 ```json
@@ -85,10 +86,10 @@ Note the array order is the order races were actually driven (chosen by the whee
 
 ### Player colors (fallback when a season has no teams)
 ```js
-Frenzy:  '#990000'  // red        Shaya:   '#e8002d'
-Gorba:   '#22c55e'  // green      Oddi:    '#22c55e'
-Antonio: '#8b5cf6'  // purple     Philip:  '#f97316'
-Dave:    '#eab308'  // yellow     William: '#06b6d4'
+Shaya:   '#e8002d'  // red        Philip:  '#f97316'  // orange
+Oddi:    '#22c55e'  // green      William: '#06b6d4'  // cyan
+Antonio: '#8b5cf6'  // purple
+Dave:    '#eab308'  // yellow
 ```
 
 `fargeFor()` in `results.js` resolves a colour in this order: the driver's team colour (`lag[].farge`), then `PLAYER_COLORS`, then the generic `COLORS` palette. It drives both the chart lines and the team colour bar in the standings; the second driver in each team pair is drawn dashed so the pair can be told apart.

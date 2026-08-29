@@ -1,7 +1,7 @@
 import { fetchData } from './api.js';
 
 const STORAGE_KEY = 'f1boyza_predictions';
-const PLAYERS = ['Frenzy', 'Gorba', 'Antonio', 'Dave'];
+const PLAYERS = ['Shaya', 'Oddi', 'Antonio', 'Dave'];
 const MONTHS_NO = ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
 
 function load() {

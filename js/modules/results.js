@@ -3,12 +3,11 @@ import Chart from 'chart.js/auto';
 import { showDriverModal } from './modal.js';
 import { normaliserSesonger, lagTilForer, total } from './season.js';
 import { kode } from './codes.js';
+import { parsePodium } from './podium.js';
 
 const COLORS = ['#b026ff', '#00d47f', '#ffd320', '#ff6b35', '#06b6d4', '#ff69b4', '#8b5cf6', '#80deea'];
 
 const PLAYER_COLORS = {
-  Frenzy:  '#990000',
-  Gorba:   '#22c55e',
   Antonio: '#8b5cf6',
   Dave:    '#eab308',
   Shaya:   '#e8002d',
@@ -109,21 +108,14 @@ function buildTable(tableEl, entries, allDrivers, kalenderData, rounds, farge) {
   });
 }
 
-function extractName(text, label) {
-  const m = text.match(new RegExp(label + ':\\s*([\\w]+)', 'i'));
-  return m ? m[1].trim() : null;
-}
-
-function computeStats(kalenderData, resultsData) {
-  const wins = {}, poles = {}, sprints = {};
+function computeStats(kalenderData) {
+  const wins = {}, poles = {}, sprints = {}, slamDunks = {};
   let lastWinner = null, currentStreak = 0, bestStreak = { driver: null, count: 0 };
 
   Object.values(kalenderData).forEach(season => {
     season.forEach(race => {
       if (!race.kjort || !race.podium) return;
-      const winner = extractName(race.podium, 'Racevinner');
-      const pole   = extractName(race.podium, 'Pole');
-      const sprint = extractName(race.podium, 'Sprintvinner');
+      const { pole, sprintpole, vinner: winner, sprint, slamDunk } = parsePodium(race.podium);
 
       if (winner) {
         wins[winner] = (wins[winner] || 0) + 1;
@@ -131,16 +123,11 @@ function computeStats(kalenderData, resultsData) {
         lastWinner = winner;
         if (currentStreak > bestStreak.count) bestStreak = { driver: winner, count: currentStreak };
       }
-      if (pole)   poles[pole]     = (poles[pole] || 0) + 1;
-      if (sprint) sprints[sprint] = (sprints[sprint] || 0) + 1;
-    });
-  });
-
-  let bigHaul = { driver: null, points: 0, round: null };
-  resultsData.forere.forEach(f => {
-    f.poeng.forEach((val, i) => {
-      const delta = i === 0 ? val : val - f.poeng[i - 1];
-      if (delta > bigHaul.points) bigHaul = { driver: f.navn, points: delta, round: resultsData.runder[i] };
+      // Sprint-pole teller som pole, på linje med løps-polen.
+      if (pole)       poles[pole]           = (poles[pole] || 0) + 1;
+      if (sprintpole) poles[sprintpole]     = (poles[sprintpole] || 0) + 1;
+      if (sprint)     sprints[sprint]       = (sprints[sprint] || 0) + 1;
+      if (slamDunk) slamDunks[winner] = (slamDunks[winner] || 0) + 1;
     });
   });
 
@@ -148,7 +135,8 @@ function computeStats(kalenderData, resultsData) {
     topWinner: Object.entries(wins).sort((a, b) => b[1] - a[1])[0],
     topPole:   Object.entries(poles).sort((a, b) => b[1] - a[1])[0],
     topSprint: Object.entries(sprints).sort((a, b) => b[1] - a[1])[0],
-    bestStreak, bigHaul,
+    topSlam:   Object.entries(slamDunks).sort((a, b) => b[1] - a[1])[0],
+    bestStreak,
   };
 }
 
@@ -168,7 +156,7 @@ function renderStats(stats) {
     stat('Flest poles',       stats.topPole   ? `${stats.topPole[0]} · ${stats.topPole[1]}`     : null) +
     stat('Flest sprintseire', stats.topSprint ? `${stats.topSprint[0]} · ${stats.topSprint[1]}` : null) +
     stat('Lengste seiersrekke', stats.bestStreak.driver ? `${stats.bestStreak.driver} · ${stats.bestStreak.count}` : null) +
-    stat('Største runde',     stats.bigHaul.driver ? `${stats.bigHaul.driver} · +${stats.bigHaul.points}p ${stats.bigHaul.round}` : null);
+    stat('Flest slam dunks',  stats.topSlam   ? `${stats.topSlam[0]} · ${stats.topSlam[1]}`     : null);
 }
 
 function renderDominance(forere) {
@@ -325,7 +313,7 @@ export function initResults() {
         };
       }
 
-      if (kalenderData) renderStats(computeStats(kalenderData, data));
+      if (kalenderData) renderStats(computeStats(kalenderData));
       renderDominance(data.forere);
     }
 
