@@ -77,7 +77,7 @@ Points to keep in mind:
 **Security.** Row Level Security is on for every table: anyone may `select`, but writing requires being logged in *and* listed in `admin_brukere` (checked by the `er_admin()` function). The publishable key in the bundle therefore grants reads only. The unlisted `/admin.html` URL is convenience, not protection.
 
 ### Fallback files (`data/`)
-The JSON files are still shipped and are read **only when Supabase does not answer** (a paused free-tier project, network trouble). They are frozen snapshots — nothing writes to them — so refresh them by hand now and then if the fallback is to be worth anything. The shapes below are therefore both the fallback format and the contract `data.js` reproduces.
+The JSON files are still shipped and are read **only when Supabase does not answer** (a paused free-tier project, network trouble). They are frozen snapshots — nothing writes to them — so regenerate them from the database now and then, or the fallback shows a stale season. Last regenerated 2026-08-30. The shapes below are therefore both the fallback format and the contract `data.js` reproduces.
 
 **`data/kalender.json`** — keyed by season (`"2025"`, `"2026"`), each an array of:
 ```json
@@ -100,6 +100,8 @@ The JSON files are still shipped and are read **only when Supabase does not answ
   }
 }
 ```
+`bot: true` marks an AI driver, which the toggle on `resultater.html` filters out; humans simply have no `bot` field.
+
 `poeng[i]` is what that player scored in race `i` — **not** a running total. To record a race, append one number per driver; nothing else needs updating.
 
 A team with no `poeng` list gets its points summed from the drivers in `forere` (this is how 2026 works). A team that *has* a `poeng` list keeps it — 2025 does, because its two-team points don't equal the driver sums.

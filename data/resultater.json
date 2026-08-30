@@ -1,87 +1,52 @@
 {
   "2025": {
     "runder": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "R16", "R17", "R18", "R19", "R20", "R21", "R22", "R23", "R24"],
-    "forere": [
-      {
-        "navn": "Antonio",
-        "poeng": [7, 0, 0, 0, 15, 18, 25, 4, 0, 0, 0, 0, 0, 18, 18, 12, 24, 0, 0, 19, 0, 17, 3, 0]
-      },
-      {
-        "navn": "Shaya",
-        "poeng": [8, 8, 26, 26, 24, 25, 18, 13, 18, 25, 33, 25, 16, 33, 21, 18, 34, 2, 26, 25, 26, 32, 0, 26]
-      },
-      {
-        "navn": "Oddi",
-        "poeng": [6, 26, 18, 18, 8, 15, 15, 25, 18, 19, 18, 0, 18, 7, 25, 25, 22, 2, 18, 4, 4, 1, 1, 0]
-      },
-      {
-        "navn": "Dave",
-        "poeng": [21, 0, 0, 0, 0, 0, 12, 0, 15, 0, 0, 2, 25, 0, 4, 0, 17, 0, 0, 0, 0, 8, 0, 0]
-      }
-    ],
     "lag": [
-      {
-        "navn": "Ferrari",
-        "farge": "#e8002d",
-        "poeng": [15, 8, 26, 26, 39, 43, 43, 17, 18, 58, 25, 16, 51, 69, 58, 2, 26, 44, 26, 49, 29, 62, 0, 0]
-      },
-      {
-        "navn": "McLaren",
-        "farge": "#ff8000",
-        "poeng": [27, 26, 18, 14, 12, 15, 27, 35, 23, 19, 20, 43, 7, 54, 39, 2, 18, 4, 4, 9, 34, 20, 0, 0]
-      }
+      { "navn": "Ferrari", "farge": "#e8002d", "poeng": [15, 8, 26, 26, 39, 43, 43, 17, 18, 58, 25, 16, 51, 69, 58, 2, 26, 44, 26, 49, 29, 62, 0, 0] },
+      { "navn": "McLaren", "farge": "#ff8000", "poeng": [27, 26, 18, 14, 12, 15, 27, 35, 23, 19, 20, 43, 7, 54, 39, 2, 18, 4, 4, 9, 34, 20, 0, 0] }
+    ],
+    "forere": [
+      { "navn": "Antonio", "poeng": [7, 0, 0, 0, 15, 18, 25, 4, 0, 0, 0, 0, 0, 18, 18, 12, 24, 0, 0, 19, 0, 17, 3, 0] },
+      { "navn": "Shaya", "poeng": [8, 8, 26, 26, 24, 25, 18, 13, 18, 25, 33, 25, 16, 33, 21, 18, 34, 2, 26, 25, 26, 32, 0, 26] },
+      { "navn": "Oddi", "poeng": [6, 26, 18, 18, 8, 15, 15, 25, 18, 19, 18, 0, 18, 7, 25, 25, 22, 2, 18, 4, 4, 1, 1, 0] },
+      { "navn": "Dave", "poeng": [21, 0, 0, 0, 0, 0, 12, 0, 15, 0, 0, 2, 25, 0, 4, 0, 17, 0, 0, 0, 0, 8, 0, 0] }
     ]
   },
   "2026": {
     "runder": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "R16", "R17", "R18", "R19", "R20", "R21", "R22", "R23", "R24"],
     "lag": [
-      {
-        "navn": "Ferrari",
-        "farge": "#e8002d",
-        "forere": ["Shaya", "Philip"]
-      },
-      {
-        "navn": "Red Bull",
-        "farge": "#3671c6",
-        "forere": ["Antonio", "Oddi"]
-      },
-      {
-        "navn": "Mercedes",
-        "farge": "#27f4d2",
-        "forere": ["Dave", "William"]
-      }
+      { "navn": "Ferrari", "farge": "#e8002d", "forere": ["Shaya", "Philip"] },
+      { "navn": "Red Bull", "farge": "#3671c6", "forere": ["Antonio", "Oddi"] },
+      { "navn": "Mercedes", "farge": "#27f4d2", "forere": ["Dave", "William"] },
+      { "navn": "McLaren", "farge": "#ff8000", "forere": ["Kevin", "Piastri"] },
+      { "navn": "Aston Martin", "farge": "#229971", "forere": ["Alonso", "Stroll"] },
+      { "navn": "Alpine", "farge": "#0093cc", "forere": ["Gasly", "Colapinto"] },
+      { "navn": "Williams", "farge": "#1868db", "forere": ["Albon", "Sainz"] },
+      { "navn": "Racing Bulls", "farge": "#6692ff", "forere": ["Hadjar", "Lawson"] },
+      { "navn": "Kick Sauber", "farge": "#52e252", "forere": ["Hulkenberg", "Bortoleto"] },
+      { "navn": "Haas", "farge": "#b6babd", "forere": ["Ocon", "Bearman"] }
     ],
     "forere": [
-      {
-        "navn": "Shaya",
-        "lag": "Ferrari",
-        "poeng": [18]
-      },
-      {
-        "navn": "Philip",
-        "lag": "Ferrari",
-        "poeng": [0]
-      },
-      {
-        "navn": "Antonio",
-        "lag": "Red Bull",
-        "poeng": [12]
-      },
-      {
-        "navn": "Oddi",
-        "lag": "Red Bull",
-        "poeng": [25]
-      },
-      {
-        "navn": "Dave",
-        "lag": "Mercedes",
-        "poeng": [10]
-      },
-      {
-        "navn": "William",
-        "lag": "Mercedes",
-        "poeng": [15]
-      }
+      { "navn": "Shaya", "lag": "Ferrari", "poeng": [18, 25] },
+      { "navn": "Philip", "lag": "Ferrari", "poeng": [0, 0] },
+      { "navn": "Antonio", "lag": "Red Bull", "poeng": [12, 18] },
+      { "navn": "Oddi", "lag": "Red Bull", "poeng": [25, 12] },
+      { "navn": "Dave", "lag": "Mercedes", "poeng": [10, 15] },
+      { "navn": "William", "lag": "Mercedes", "poeng": [15, 10] },
+      { "navn": "Kevin", "lag": "McLaren", "poeng": [0, 0] },
+      { "navn": "Piastri", "lag": "McLaren", "bot": true, "poeng": [8, 8] },
+      { "navn": "Alonso", "lag": "Aston Martin", "bot": true, "poeng": [6, 4] },
+      { "navn": "Stroll", "lag": "Aston Martin", "bot": true, "poeng": [0, 0] },
+      { "navn": "Gasly", "lag": "Alpine", "bot": true, "poeng": [0, 0] },
+      { "navn": "Colapinto", "lag": "Alpine", "bot": true, "poeng": [0, 0] },
+      { "navn": "Albon", "lag": "Williams", "bot": true, "poeng": [4, 0] },
+      { "navn": "Sainz", "lag": "Williams", "bot": true, "poeng": [0, 6] },
+      { "navn": "Hadjar", "lag": "Racing Bulls", "bot": true, "poeng": [0, 0] },
+      { "navn": "Lawson", "lag": "Racing Bulls", "bot": true, "poeng": [0, 0] },
+      { "navn": "Hulkenberg", "lag": "Kick Sauber", "bot": true, "poeng": [2, 2] },
+      { "navn": "Bortoleto", "lag": "Kick Sauber", "bot": true, "poeng": [1, 1] },
+      { "navn": "Ocon", "lag": "Haas", "bot": true, "poeng": [0, 0] },
+      { "navn": "Bearman", "lag": "Haas", "bot": true, "poeng": [0, 0] }
     ]
   }
 }

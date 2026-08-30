@@ -123,8 +123,8 @@ export function hentResultater() {
         forere: forere.map(f => {
           const rad = { navn: f.spiller };
           if (f.lag_id) rad.lag = lagNavn.get(f.lag_id);
+          if (erBot.has(f.spiller)) rad.bot = true;
           rad.poeng = poengFor(p => p.spiller === f.spiller);
-          rad.bot = erBot.has(f.spiller);
           return rad;
         }),
       };

@@ -1,10 +1,10 @@
 {
   "penaltyPoints": [
-    { "fører": "Antonio", "poeng": 1, "runde": "R3", "beskrivelse": "Divebombet Dave og ødela vingen hans" },
-    { "fører": "Antonio", "poeng": 4, "runde": "R20", "beskrivelse": "Kjørte for nærme Oddi under safetycar" },
-    { "fører": "Shaya", "poeng": 2, "runde": "R15", "beskrivelse": "Skviste Oddi ut under racestart" },
-    { "fører": "Oddi", "poeng": 3, "runde": "R21", "beskrivelse": "Kræsjet inn i Antonio og Shaya" },
-    { "fører": "Oddi", "poeng": 5, "runde": "R22", "beskrivelse": "Break check og weaving for å sabotere" },
-    { "fører": "Dave", "poeng": 1, "runde": "R22", "beskrivelse": "Rammer Shaya i siden gjentatte ganger" }
+    { "fører": "Antonio",  "poeng": 1,  "runde": "R3",   "beskrivelse": "Divebombet Dave og ødela vingen hans" },
+    { "fører": "Antonio",  "poeng": 4,  "runde": "R20",  "beskrivelse": "Kjørte for nærme Oddi under safetycar" },
+    { "fører": "Shaya",    "poeng": 2,  "runde": "R15",  "beskrivelse": "Skviste Oddi ut under racestart" },
+    { "fører": "Oddi",     "poeng": 3,  "runde": "R21",  "beskrivelse": "Kræsjet inn i Antonio og Shaya" },
+    { "fører": "Oddi",     "poeng": 5,  "runde": "R22",  "beskrivelse": "Break check og weaving for å sabotere" },
+    { "fører": "Dave",     "poeng": 1,  "runde": "R22",  "beskrivelse": "Rammer Shaya i siden gjentatte ganger" }
   ]
 }
