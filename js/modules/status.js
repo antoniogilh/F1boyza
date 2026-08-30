@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentDatoer } from './data.js';
 
 function startenAvDagen(d) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -19,7 +19,7 @@ export function initStatusBar() {
     flagEl.className = `status-flag${klasse ? ' ' + klasse : ''}`;
   }
 
-  fetchData('data/datoer.json').then(data => {
+  hentDatoer().then(data => {
     if (!data) {
       setFlag('Ingen data', 'idle');
       return;

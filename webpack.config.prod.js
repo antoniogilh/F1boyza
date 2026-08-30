@@ -21,22 +21,32 @@ module.exports = merge(common, {
     new HtmlWebpackPlugin({
       template: 'index.html',
       filename: 'index.html',
+      chunks: ['app'],
     }),
     new HtmlWebpackPlugin({
       template: 'kalender.html',
       filename: 'kalender.html',
+      chunks: ['app'],
     }),
     new HtmlWebpackPlugin({
       template: 'resultater.html',
       filename: 'resultater.html',
+      chunks: ['app'],
     }),
     new HtmlWebpackPlugin({
       template: 'straff.html',
       filename: 'straff.html',
+      chunks: ['app'],
     }),
     new HtmlWebpackPlugin({
       template: 'Spinthatshit.html',
       filename: 'Spinthatshit.html',
+      chunks: ['app'],
+    }),
+    new HtmlWebpackPlugin({
+      template: 'admin.html',
+      filename: 'admin.html',
+      chunks: ['admin'],
     }),
     new CopyPlugin({
       patterns: [

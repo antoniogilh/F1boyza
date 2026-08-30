@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentResultater } from './data.js';
 import Chart from 'chart.js/auto';
 import { normaliserSesonger, total } from './season.js';
 
@@ -10,7 +10,7 @@ export function initHeadToHead() {
   const chartEl = document.getElementById('h2hChart');
   if (!sel1 || !sel2 || !chartEl) return;
 
-  fetchData('data/resultater.json').then(rawData => {
+  hentResultater().then(rawData => {
     if (!rawData) return;
 
     // Datafila er per løp; grafen viser løpende totaler.

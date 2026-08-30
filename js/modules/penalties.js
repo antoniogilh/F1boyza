@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentStraff } from './data.js';
 import Chart from 'chart.js/auto';
 import { kode } from './codes.js';
 
@@ -14,7 +14,7 @@ export function initPenalties() {
   const tbody = document.querySelector('#penaltyTable tbody');
   if (!tbody) return;
 
-  fetchData('data/straff.json').then(data => {
+  hentStraff().then(data => {
     if (!data) {
       tbody.innerHTML = '<tr><td colspan="5">Kunne ikke laste straffedata.</td></tr>';
       return;

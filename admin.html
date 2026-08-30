@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="fanelogo.png" />
+  <title>F1 BOYZA – Race control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@100..150,700..900&family=Archivo:wght@400;500;600&family=Martian+Mono:wdth,wght@87.5..112.5,300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- Ikke lenket fra menyen på de andre sidene. Den ekte sperren er likevel
+     innlogging + RLS i databasen, ikke at adressen er ukjent. -->
+<header class="page-head">
+  <span class="eyebrow">Kun for innlogget</span>
+  <h1>Race control</h1>
+  <p>Her legges alle dataene inn. Endringer er synlige på siden med én gang.</p>
+</header>
+
+<main class="container single" id="adminMain">
+  <section class="panel" id="loginPanel" hidden>
+    <div class="panel-head">
+      <h2>Logg inn</h2>
+    </div>
+    <div class="panel-body">
+      <form id="loginForm" class="admin-login">
+        <input type="email" id="loginEpost" class="admin-input" placeholder="E-post" autocomplete="username" required>
+        <input type="password" id="loginPassord" class="admin-input" placeholder="Passord" autocomplete="current-password" required>
+        <button type="submit" class="admin-btn primary">Logg inn</button>
+      </form>
+      <p class="admin-melding" id="loginMelding"></p>
+    </div>
+  </section>
+
+  <div id="adminInnhold" hidden></div>
+</main>
+
+<footer>© F1 BOYZA</footer>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

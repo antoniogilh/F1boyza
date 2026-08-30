@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentDatoer } from './data.js';
 
 function startenAvDagen(d) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -16,7 +16,7 @@ export function initCountdown() {
   const el = document.getElementById('countdown');
   if (!el) return;
 
-  fetchData('data/datoer.json').then(data => {
+  hentDatoer().then(data => {
     if (!data) return;
 
     // Datoene er dager, ikke klokkeslett. Et løp «i dag» er ikke passert.

@@ -1349,3 +1349,176 @@ body.race-weekend .statusbar {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- ADMIN (race control) ---- */
+/* Egen side, samme formspråk: mørk monitor, monospace-tall, lilla = aktiv. */
+
+.admin-topp {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.admin-topp .admin-melding { flex: 1; margin: 0; }
+
+.admin-input {
+  width: 100%;
+  padding: 6px 9px;
+  font-family: var(--data);
+  font-size: 0.72rem;
+  color: var(--text);
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+
+.admin-input:hover,
+.admin-input:focus { border-color: var(--purple); }
+.admin-input[type='color'] { padding: 2px; height: 30px; cursor: pointer; }
+.admin-input[type='number'] { text-align: right; }
+
+.admin-btn {
+  padding: 7px 14px;
+  font-family: var(--data);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.admin-btn:hover { color: var(--text); border-color: var(--purple); }
+.admin-btn.primary { color: var(--purple-ink); border-color: var(--purple); }
+.admin-btn.primary:hover { background: rgba(176, 38, 255, 0.12); }
+.admin-btn.fare:hover { color: var(--red-hot); border-color: var(--red-hot); }
+
+.admin-login {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 460px;
+}
+
+.admin-login .admin-input { flex: 1 1 180px; width: auto; }
+
+.admin-melding {
+  min-height: 1.2em;
+  margin: 10px 0 0;
+  font-family: var(--data);
+  font-size: 0.68rem;
+}
+
+.admin-melding.ok { color: var(--green); }
+.admin-melding.feil { color: var(--red-hot); }
+
+.admin-verktoy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.admin-verktoy .admin-input { width: auto; max-width: 120px; }
+
+.admin-hjelp {
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--dimmer);
+}
+
+.admin-skille {
+  width: 1px;
+  height: 22px;
+  background: var(--rule);
+}
+
+/* Tettere celler enn resultattabellene, siden hver celle er et skjemafelt. */
+.admin-table td { padding: 5px 8px; }
+.admin-table th { white-space: nowrap; }
+.admin-table tbody tr:hover td { background: none; }
+
+.admin-todelt {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px;
+  padding: 18px;
+}
+
+.admin-todelt .admin-btn { margin-top: 12px; }
+
+.admin-underhead {
+  margin: 0 0 10px;
+  font-family: var(--data);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* Poengrutenettet i admin: kolonnebredden skal komme fra feltet, ikke fra
+   navnet i overskriften — ellers blir «Ocon» en kolonne du ikke kan lese
+   tallet i, mens «Hulkenberg» blir dobbelt så bred. */
+#tabellResultater {
+  table-layout: fixed;
+  width: max-content;
+  min-width: 100%;
+}
+
+#tabellResultater th,
+#tabellResultater td { width: 5.4rem; }
+
+#tabellResultater th {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  letter-spacing: 0.1em;
+}
+
+#tabellResultater .admin-input { width: 100%; }
+
+/* Rundekolonnen blir stående når grida er bred nok til å måtte skrolles. */
+#tabellResultater th:first-child,
+#tabellResultater td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 4.2rem;
+  background: var(--panel);
+}
+
+/* Podium-valgene i admin: fire nedtrekk pluss slam dunk, på én linje så lenge
+   det er plass. Sprintfeltene vises bare når raden er en sprinthelg. */
+.podium-rutenett {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  align-items: end;
+}
+
+.podium-felt {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.podium-felt > span {
+  font-family: var(--data);
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dimmer);
+}
+
+.podium-felt .admin-input { width: 8.5rem; }
+
+.podium-rutenett .kun-sprint { display: none; }
+tr.er-sprint .podium-rutenett .kun-sprint { display: flex; }

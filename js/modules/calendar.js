@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentKalender } from './data.js';
 
 let kalenderData = {};
 
@@ -57,7 +57,7 @@ export function initCalendar() {
 
   if (!seasonSelect || !calendarContainer) return;
 
-  fetchData('data/kalender.json').then(data => {
+  hentKalender().then(data => {
     if (!data) {
       calendarContainer.innerHTML = '<p>Kunne ikke laste kalenderdata.</p>';
       return;

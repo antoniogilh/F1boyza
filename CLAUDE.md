@@ -27,7 +27,9 @@ No test suite is configured.
 `js/app.js` is the webpack entry point. It imports all page modules and calls their `init*()` functions on `DOMContentLoaded`. Each module guards against running on the wrong page by checking for required DOM elements, so all modules are safely initialized on every page load.
 
 **All modules:**
-- `js/modules/api.js` — shared `fetchData(url)` wrapper. Caches the promise per URL, so several modules can read the same file on one page without refetching
+- `js/modules/supabase.js` — creates the Supabase client. URL and publishable key are public on purpose; the key only grants reads
+- `js/modules/data.js` — the read layer. `hentKalender()` / `hentDatoer()` / `hentResultater()` / `hentStraff()` query Supabase and rebuild **exactly** the object shapes the JSON files used to have, so no display module needed changing. Caches the promise per dataset, and falls back to `data/*.json` when the database does not answer
+- `js/modules/api.js` — shared `fetchData(url)` wrapper, now only used by `data.js` as the fallback file reader. Caches the promise per URL
 - `js/modules/navigation.js` — sticky nav + active link highlight
 - `js/modules/status.js` — fills the status strip present at the top of every page (`#statusSeason`, `#statusRound`, `#statusFlag`) from `data/datoer.json`. Sets `body.race-weekend` when today is a race day
 - `js/modules/codes.js` — no DOM; maps player and team names to the three-letter codes used in tables, the grid and race control (`Shaya` → `SHA`, `Red Bull` → `RBR`). Unknown names fall back to the first three letters
@@ -45,8 +47,37 @@ No test suite is configured.
 - `js/modules/season.js` — no DOM; converts `resultater.json` from per-race points to cumulative and derives team points from driver pairs. Used by `results.js` and `headtohead.js`
 - `js/modules/sound.js` — Web Audio API tick sound generator used by wheel. No audio files required
 
-### Data Files (`data/`)
-JSON files fetched client-side at runtime.
+**Admin page.** `admin.html` + `js/admin.js` is a separate bundle, not imported by `app.js` and not linked from the navigation on any page. It logs in with Supabase Auth and writes straight to the tables: results, races and podium text, penalties, dates, teams and drivers, players, and seasons. It reads the tables directly rather than through `data.js`, since `data.js` caches and reshapes for display.
+
+### Database
+All data lives in Supabase (project `f1boyza`, `xanbyscizkhsldosrplq`, eu-north-1) and is read straight from the browser — the site is static on GitHub Pages, so there is no backend to put in between.
+
+**Tables** (all Norwegian, mirroring the domain rather than the old files):
+
+```
+sesonger        aar PK, antall_runder
+spillere        navn PK, farge, kode, rekkefolge
+lag             id PK, aar, navn, farge, rekkefolge      unique(aar, navn)
+sesong_forere   aar, spiller, lag_id NULL, rekkefolge     PK(aar, spiller)
+lop             aar, rekkefolge, navn, kjort, podium      PK(aar, rekkefolge)
+runder          aar, runde, dato NULL                     PK(aar, runde)
+resultater      aar, runde, spiller, poeng                PK(aar, runde, spiller)
+lag_poeng       lag_id, runde, poeng                      PK(lag_id, runde)
+straffer        id PK, spiller, runde, poeng, beskrivelse
+admin_brukere   bruker uuid PK -> auth.users(id)
+```
+
+Points to keep in mind:
+- `sesonger.antall_runder` gives the `runder` label list in the results, and is **not** the same as the number of rows in `runder` — 2025 has 24 rounds but only 23 dated ones.
+- A round counts as driven only if it has `resultater` rows. Deleting all rows for a round un-drives it.
+- `lag_poeng` exists only for seasons whose team points are not the sum of their drivers (2025). Without rows there, the team is summed from `sesong_forere` — same rule as `lagPoengPerLop()` in `season.js`.
+- `lop.navn` keeps the `[Sprint]` suffix, and `lop.podium` stays free text; `podium.js` is still the parser.
+- Rounds are integers in the database and formatted back to `"R1"` in `data.js`.
+
+**Security.** Row Level Security is on for every table: anyone may `select`, but writing requires being logged in *and* listed in `admin_brukere` (checked by the `er_admin()` function). The publishable key in the bundle therefore grants reads only. The unlisted `/admin.html` URL is convenience, not protection.
+
+### Fallback files (`data/`)
+The JSON files are still shipped and are read **only when Supabase does not answer** (a paused free-tier project, network trouble). They are frozen snapshots — nothing writes to them — so refresh them by hand now and then if the fallback is to be worth anything. The shapes below are therefore both the fallback format and the contract `data.js` reproduces.
 
 **`data/kalender.json`** — keyed by season (`"2025"`, `"2026"`), each an array of:
 ```json
@@ -129,6 +160,8 @@ Three type roles, all variable-width Google Fonts:
 ### Build
 Webpack merges `webpack.common.js` with env-specific configs:
 - Dev (`webpack.config.dev.js`): inline source maps, webpack-dev-server from `./` root
-- Prod (`webpack.config.prod.js`): `MiniCssExtractPlugin`, `HtmlWebpackPlugin` for all 5 HTML pages, `CopyPlugin` copies `img/`, `data/`, icons, manifests to `dist/`
+- Prod (`webpack.config.prod.js`): `MiniCssExtractPlugin`, `HtmlWebpackPlugin` for all 6 HTML pages, `CopyPlugin` copies `img/`, `data/`, icons, manifests to `dist/`
 
-**npm dependencies:** `chart.js` (charts), `canvas-confetti` (spin wheel), `copy-webpack-plugin@^12` (prod build — must stay at v6+ for object-syntax API).
+Two entry points: `app` (every public page) and `admin` (`admin.html` only). **Each `HtmlWebpackPlugin` must name its `chunks`**, otherwise every page would load both bundles.
+
+**npm dependencies:** `chart.js` (charts), `canvas-confetti` (spin wheel), `@supabase/supabase-js` (database + login), `copy-webpack-plugin@^12` (prod build — must stay at v6+ for object-syntax API).

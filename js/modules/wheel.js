@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentKalender } from './data.js';
 import confetti from 'canvas-confetti';
 import { playTick, resumeAudio } from './sound.js';
 
@@ -23,7 +23,7 @@ export function initWheel() {
 
   ctx = wheelCanvas.getContext('2d');
 
-  fetchData('data/kalender.json').then(data => {
+  hentKalender().then(data => {
     if (!data) return;
     kalenderData = data;
 

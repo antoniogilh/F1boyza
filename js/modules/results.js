@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentResultater, hentKalender } from './data.js';
 import Chart from 'chart.js/auto';
 import { showDriverModal } from './modal.js';
 import { normaliserSesonger, lagTilForer, total } from './season.js';
@@ -210,8 +210,8 @@ export function initResults() {
   if (!driverChartEl || !teamChartEl) return;
 
   Promise.all([
-    fetchData('data/resultater.json'),
-    fetchData('data/kalender.json'),
+    hentResultater(),
+    hentKalender(),
   ]).then(([rawData, kalenderData]) => {
     if (!rawData) return;
 
@@ -229,10 +229,35 @@ export function initResults() {
 
     let driverChart = null;
     let teamChart   = null;
+    // Botsa er med som standard; knappen tar dem bort når grida blir uleselig.
+    let visBots = true;
+
+    const botBtn = document.getElementById('botToggle');
+    if (botBtn) {
+      botBtn.addEventListener('click', () => {
+        visBots = !visBots;
+        render();
+      });
+    }
 
     function render() {
       const data = allData[seasonSelect.value];
       if (!data) return;
+
+      // Et lag regnes som menneskelig så lenge minst én av førerne er det.
+      const harBots = data.forere.some(f => f.bot);
+      const menneskelag = new Set(
+        data.forere.filter(f => !f.bot)
+          .map(f => (lagTilForer(data, f.navn) || {}).navn)
+      );
+
+      const synligeForere = visBots ? data.forere : data.forere.filter(f => !f.bot);
+      const synligeLag    = visBots ? data.lag    : data.lag.filter(l => menneskelag.has(l.navn));
+
+      if (botBtn) {
+        botBtn.hidden = !harBots;
+        botBtn.textContent = visBots ? 'Bare mennesker' : 'Vis alle førere';
+      }
 
       let cumulative = true;
       const toggleBtn = document.getElementById('chartToggle');
@@ -248,7 +273,7 @@ export function initResults() {
         type: 'line',
         data: {
           labels: data.runder,
-          datasets: data.forere.map((f, i) => {
+          datasets: synligeForere.map((f, i) => {
             // Førere arver lagfargen; makkeren får stiplet linje så de kan skilles.
             const lag   = lagTilForer(data, f.navn);
             const color = fargeFor(data, f.navn, i);
@@ -267,7 +292,7 @@ export function initResults() {
       });
 
       buildTable(
-        document.getElementById('driverTable'), data.forere, data.forere,
+        document.getElementById('driverTable'), synligeForere, synligeForere,
         kalenderData || {}, data.runder,
         (entry, i) => fargeFor(data, entry.navn, i),
       );
@@ -276,7 +301,7 @@ export function initResults() {
         type: 'line',
         data: {
           labels: data.runder,
-          datasets: data.lag.map((l, i) => {
+          datasets: synligeLag.map((l, i) => {
             const color = l.farge || COLORS[i % COLORS.length];
             return {
               label: l.navn, data: [...l.poeng], tension: 0,
@@ -291,7 +316,7 @@ export function initResults() {
       });
 
       buildTable(
-        document.getElementById('teamTable'), data.lag, data.lag,
+        document.getElementById('teamTable'), synligeLag, synligeLag,
         kalenderData || {}, data.runder,
         (entry, i) => entry.farge || COLORS[i % COLORS.length],
       );
@@ -302,19 +327,19 @@ export function initResults() {
           toggleBtn.textContent = cumulative ? 'Vis per runde' : 'Vis totalt';
 
           driverChart.data.datasets.forEach((ds, i) => {
-            ds.data = cumulative ? [...data.forere[i].poeng] : toPerRound(data.forere[i].poeng);
+            ds.data = cumulative ? [...synligeForere[i].poeng] : toPerRound(synligeForere[i].poeng);
           });
           driverChart.update();
 
           teamChart.data.datasets.forEach((ds, i) => {
-            ds.data = cumulative ? [...data.lag[i].poeng] : toPerRound(data.lag[i].poeng);
+            ds.data = cumulative ? [...synligeLag[i].poeng] : toPerRound(synligeLag[i].poeng);
           });
           teamChart.update();
         };
       }
 
       if (kalenderData) renderStats(computeStats(kalenderData));
-      renderDominance(data.forere);
+      renderDominance(synligeForere);
     }
 
     seasonSelect.addEventListener('change', render);

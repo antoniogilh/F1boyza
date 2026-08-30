@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentDatoer } from './data.js';
 
 const DAYS_NO = ['søn', 'man', 'tir', 'ons', 'tor', 'fre', 'lør'];
 const MONTHS_NO = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
@@ -35,7 +35,7 @@ export function initDates() {
 
   let datesData = {};
 
-  fetchData('data/datoer.json').then(data => {
+  hentDatoer().then(data => {
     if (!data) {
       container.innerHTML = '<p>Kunne ikke laste datoer.</p>';
       return;

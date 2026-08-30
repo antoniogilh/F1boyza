@@ -1,8 +1,10 @@
 /**
  * Shared fetch wrapper with error handling.
  *
- * Flere moduler leser de samme datafilene på samme side (statuslinja og
- * nedtellingen deler datoer.json), så svaret caches per URL.
+ * Dataene kommer fra Supabase (js/modules/data.js). Denne leser filene under
+ * data/ og brukes nå bare som reserve når databasen ikke svarer.
+ *
+ * Svaret caches per URL, siden flere moduler kan be om samme fil på én side.
  */
 const cache = new Map();
 

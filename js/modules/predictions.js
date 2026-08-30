@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentDatoer } from './data.js';
 
 const STORAGE_KEY = 'f1boyza_predictions';
 const PLAYERS = ['Shaya', 'Oddi', 'Antonio', 'Dave'];
@@ -21,7 +21,7 @@ export function initPredictions() {
   const el = document.getElementById('predictionsSection');
   if (!el) return;
 
-  fetchData('data/datoer.json').then(data => {
+  hentDatoer().then(data => {
     if (!data) return;
 
     const now = new Date();

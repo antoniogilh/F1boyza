@@ -1,4 +1,4 @@
-import { fetchData } from './api.js';
+import { hentResultater } from './data.js';
 import { kode } from './codes.js';
 import { lagTilForer } from './season.js';
 
@@ -159,7 +159,7 @@ function initGrid() {
   const container = document.getElementById('lineup');
   if (!container) return;
 
-  fetchData('data/resultater.json').then(allData => {
+  hentResultater().then(allData => {
     if (!allData) return;
 
     const season = Object.keys(allData).sort().pop();
