@@ -19,9 +19,16 @@ export function initHeadToHead() {
     const seasonSelect = document.getElementById('seasonSelect');
     let chart = null;
 
+    // results.js fyller sesongvelgeren asynkront og rekker det ikke alltid før
+    // denne modulen leser den. Da velger vi sesong selv, etter samme regel.
+    function standardSesong() {
+      const sesonger = Object.keys(allData).sort().reverse();
+      return sesonger.find(aar => allData[aar].forere.some(f => f.poeng.length > 0)) || sesonger[0];
+    }
+
     function getSeasonData() {
-      const season = seasonSelect ? seasonSelect.value : Object.keys(allData).sort().reverse()[0];
-      return allData[season];
+      const valgt = seasonSelect ? seasonSelect.value : '';
+      return allData[valgt] || allData[standardSesong()];
     }
 
     function populateDrivers(data) {

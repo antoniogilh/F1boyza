@@ -343,6 +343,8 @@ export function initResults() {
     }
 
     seasonSelect.addEventListener('change', render);
-    render();
+    // Sendes som event, ikke som direkte kall, slik at head-to-head lander på
+    // samme sesong som standardvalget her.
+    seasonSelect.dispatchEvent(new Event('change'));
   });
 }
