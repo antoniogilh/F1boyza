@@ -1,6 +1,6 @@
 import { hentResultater } from './data.js';
 import Chart from 'chart.js/auto';
-import { normaliserSesonger, total } from './season.js';
+import { normaliserSesonger, total, kjorteRunder } from './season.js';
 
 const CHART_FONT = { family: 'Martian Mono, ui-monospace, monospace', size: 10 };
 
@@ -63,7 +63,7 @@ export function initHeadToHead() {
       chart = new Chart(chartEl, {
         type: 'line',
         data: {
-          labels: data.runder,
+          labels: kjorteRunder(data),
           datasets: [
             {
               label: d1.navn,

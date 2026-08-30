@@ -35,6 +35,21 @@ export function total(poeng) {
   return poeng.length ? poeng[poeng.length - 1] : 0;
 }
 
+/**
+ * Rundene som faktisk er registrert. `runder` dekker hele sesongen, mens
+ * poenglistene bare går så langt som det er kjørt — grafene blir mye lettere å
+ * lese når de klippes til i stedet for å strekke to løp over tjuefire runder.
+ * En sesong uten et eneste resultat beholder hele lista, så aksen ikke blir tom.
+ */
+export function kjorteRunder(sesong) {
+  const lengder = [
+    ...sesong.forere.map(f => f.poeng.length),
+    ...sesong.lag.map(l => (l.poeng || []).length),
+  ];
+  const antall = Math.max(0, ...lengder);
+  return antall ? sesong.runder.slice(0, antall) : sesong.runder;
+}
+
 /** Slår opp hvilket lag en fører kjører for i en gitt sesong. */
 export function lagTilForer(sesong, forerNavn) {
   const forer = sesong.forere.find(f => f.navn === forerNavn);

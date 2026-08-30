@@ -1,7 +1,7 @@
 import { hentResultater, hentKalender } from './data.js';
 import Chart from 'chart.js/auto';
 import { showDriverModal } from './modal.js';
-import { normaliserSesonger, lagTilForer, total } from './season.js';
+import { normaliserSesonger, lagTilForer, total, kjorteRunder } from './season.js';
 import { kode } from './codes.js';
 import { parsePodium } from './podium.js';
 
@@ -254,6 +254,9 @@ export function initResults() {
       const synligeForere = visBots ? data.forere : data.forere.filter(f => !f.bot);
       const synligeLag    = visBots ? data.lag    : data.lag.filter(l => menneskelag.has(l.navn));
 
+      // Bare rundene som er kjørt, slik at grafene ikke er mest tom plass.
+      const runder = kjorteRunder(data);
+
       if (botBtn) {
         botBtn.hidden = !harBots;
         botBtn.textContent = visBots ? 'Bare mennesker' : 'Vis alle førere';
@@ -272,7 +275,7 @@ export function initResults() {
       driverChart = new Chart(driverChartEl, {
         type: 'line',
         data: {
-          labels: data.runder,
+          labels: runder,
           datasets: synligeForere.map((f, i) => {
             // Førere arver lagfargen; makkeren får stiplet linje så de kan skilles.
             const lag   = lagTilForer(data, f.navn);
@@ -293,14 +296,14 @@ export function initResults() {
 
       buildTable(
         document.getElementById('driverTable'), synligeForere, synligeForere,
-        kalenderData || {}, data.runder,
+        kalenderData || {}, runder,
         (entry, i) => fargeFor(data, entry.navn, i),
       );
 
       teamChart = new Chart(teamChartEl, {
         type: 'line',
         data: {
-          labels: data.runder,
+          labels: runder,
           datasets: synligeLag.map((l, i) => {
             const color = l.farge || COLORS[i % COLORS.length];
             return {
@@ -317,7 +320,7 @@ export function initResults() {
 
       buildTable(
         document.getElementById('teamTable'), synligeLag, synligeLag,
-        kalenderData || {}, data.runder,
+        kalenderData || {}, runder,
         (entry, i) => entry.farge || COLORS[i % COLORS.length],
       );
 
