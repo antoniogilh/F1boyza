@@ -10,6 +10,7 @@ const KODER = {
   Oddi:    'ODD',
   Dave:    'DAV',
   William: 'WIL',
+  Kevin:   'KEV',
 
   Ferrari:    'FER',
   McLaren:    'MCL',

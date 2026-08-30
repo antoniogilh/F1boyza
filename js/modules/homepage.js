@@ -65,6 +65,32 @@ const TRASH_TALK = {
     "William sin sesong beskrives best som en læringsprosess. Det er pent sagt.",
     "William tok ikke feil valg. Han tok alle sammen.",
   ],
+  Kevin: [
+    "Kevin har ligaens dårligste debut. Rekorden er trygg, ingen andre prøver på den.",
+    "Kevin krasjer i alle sesjoner. FP1, kvalifisering, race — full pott.",
+    "Kevin rekker å krasje før startlyset i det hele tatt har slukket.",
+    "Kevin sin debut brukes som skrekkeksempel. Av ham selv, når han er ærlig.",
+    "Kevin er et esel. Det er ikke trash talk, det er en observasjon.",
+    "Kevin sin padelserve er helt mid. Det er hans sterkeste ferdighet.",
+    "Kevin har mid padelserve og verre racing. Vi vet ikke hvilken vei det går.",
+    "Kevin krasjet i oppvarmingen. Det var før han satte seg i bilen.",
+    "Kevin sin debut var så dårlig at FIA vurderte et helt nytt flagg.",
+    "Kevin er konsekvent: han krasjer i hver eneste sesjon, uten unntak.",
+    "Å slå Kevin i padel er ikke en prestasjon. Det er en formalitet.",
+    "Kevin sin debut satte en standard. Nedover.",
+    "Kevin er esel på banen og esel på padelbanen. Konsistens er en dyd.",
+    "Kevin har krasjet i flere sesjoner enn han har fullført.",
+    "Kevin sin plan er å komme seg gjennom én sesjon uten kontakt. Vi venter fortsatt.",
+    "Kevin serverer i padel som han kjører: midt på treet, rett i nettet.",
+    "Kevin er ikke redd for veggene. De er gamle kjente.",
+    "Kevin fikk kallenavnet esel. Han protesterte ikke høyt nok.",
+    "Kevin sin pitstrategi er å håpe på det beste. Det er ikke en strategi, det er en stemning.",
+    "Kevin sin teamradio består mest av lyder. Ingen av dem er ord.",
+    "Kevin trener seg opp til sesongen. Sesongen begynte i mars.",
+    "Kevin har selvtillit som en tittelkjemper og resultater som en tilskuer.",
+    "Kevin skylder på utstyret. Utstyret har bedt om å få uttale seg.",
+    "Kevin trener i simulator. Han krasjer der også, men billigere.",
+  ],
   Philip: [
     "Philip sin pre-race rutine er kylling. Post-race rutine: også kylling.",
     "Philip valgte lag basert på hvem som hadde best kylling i hospitality.",
@@ -117,13 +143,20 @@ const TRASH_TALK = {
 
 // Sannsynlighet i prosent for hvem som blir utpekt. Må summere til 100.
 const VEKTER = {
-  Dave:    25,
-  William: 25,
-  Philip:  25,
-  Oddi:   10,
-  Shaya:   10,
+  Dave:    20,
+  William: 20,
+  Philip:  20,
+  Kevin:   20,
+  Oddi:     8,
+  Shaya:    7,
   Antonio:  5,
 };
+
+const TALLORD = ['null', 'én', 'to', 'tre', 'fire', 'fem', 'seks', 'sju', 'åtte', 'ni', 'ti', 'elleve', 'tolv'];
+
+function tallord(n) {
+  return TALLORD[n] || String(n);
+}
 
 function weightedPick() {
   const total = Object.values(VEKTER).reduce((a, b) => a + b, 0);
@@ -197,7 +230,27 @@ function initGrid() {
   });
 }
 
+// Antallet i ingressen telles opp fra dataene, så det ikke blir stående igjen
+// på gammelt tall neste gang noen melder seg på. Bots teller ikke med.
+function initHeroTelling() {
+  const el = document.getElementById('heroForere');
+  if (!el) return;
+
+  hentResultater().then(allData => {
+    if (!allData) return;
+
+    const sesong = allData[Object.keys(allData).sort().pop()];
+    if (!sesong) return;
+
+    const antall = sesong.forere.filter(f => !f.bot).length;
+    if (!antall) return;
+
+    el.textContent = `${tallord(antall)} ${antall === 1 ? 'fører' : 'førere'}`;
+  });
+}
+
 export function initHomepage() {
   initTrashTalk();
+  initHeroTelling();
   initGrid();
 }
