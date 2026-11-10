@@ -589,7 +589,7 @@ body {
   color: var(--purple-ink);
 }
 
-/* ---- ONBOARD (bildekarusell) ---- */
+/* ---- ONBOARD (karusell med bilder og klipp) ---- */
 .slider {
   position: relative;
   height: clamp(320px, 46vh, 520px);
@@ -597,7 +597,8 @@ body {
   background: #04060b;
 }
 
-.slider img {
+.slider img,
+.slider video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1314,6 +1315,19 @@ footer {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--dimmer);
+}
+
+footer a {
+  color: var(--dim);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+  transition: color 0.18s, border-color 0.18s;
+}
+
+footer a:hover,
+footer a:focus-visible {
+  color: var(--purple-ink);
+  border-color: var(--purple);
 }
 
 /* ---- MOTION ---- */
